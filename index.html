@@ -147,7 +147,7 @@
 
         /* 3. Большие шторки (Обо мне, Обучение, Услуги) - 80% */
         #about-sheet, #training-sheet, #service-details-sheet, #program-details-sheet {
-            height: calc(80vh + 150px) !important;
+            height: calc(90vh + 150px) !important;
         }
 
         /* 2. Шторка Рубрик (Огненные, Танцы, Лагерь) - 50% */
@@ -882,18 +882,34 @@
         }
 
         // ==========================================
-        // ОБЕРТКА ДЛЯ ВИБРАЦИИ (ТАКТИЛЬНЫЙ ОТКЛИК VK)
+        // ОБЕРТКА ДЛЯ ВИБРАЦИИ (ТАКТИЛЬНЫЙ ОТКЛИК VK + БРАУЗЕРЫ)
         // ==========================================
         const vkHaptic = {
             impactOccurred: (style) => {
-                if (vkBridge) {
-                    vkBridge.send('VKWebAppTapticImpactOccurred', { style: style }).catch(()=>{});
-                }
+                try {
+                    // Официальный метод для приложения ВКонтакте (работает на iOS и Android внутри ВК)
+                    if (window.vkBridge && window.vkBridge.send) {
+                        window.vkBridge.send('VKWebAppTapticImpactOccurred', { style: style }).catch(()=>{});
+                    }
+                    // Универсальный резервный метод для мобильных браузеров (Chrome, Yandex и др.)
+                    if (navigator.vibrate) {
+                        if (style === 'light') navigator.vibrate(15);
+                        else if (style === 'medium') navigator.vibrate(25);
+                        else navigator.vibrate(40);
+                    }
+                } catch (e) {}
             },
             notificationOccurred: (type) => {
-                if (vkBridge) {
-                    vkBridge.send('VKWebAppTapticNotificationOccurred', { type: type }).catch(()=>{});
-                }
+                try {
+                    if (window.vkBridge && window.vkBridge.send) {
+                        window.vkBridge.send('VKWebAppTapticNotificationOccurred', { type: type }).catch(()=>{});
+                    }
+                    if (navigator.vibrate) {
+                        if (type === 'success') navigator.vibrate([20, 50, 20]);
+                        else if (type === 'warning') navigator.vibrate([30, 50, 30, 50, 30]);
+                        else navigator.vibrate(40);
+                    }
+                } catch (e) {}
             }
         };
 
