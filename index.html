@@ -38,11 +38,11 @@
         /* 🌈 НАСТРОЙКИ ЦВЕТА ФОНА (АНИМИРОВАННЫЙ ГРАДИЕНТ) 🌈 */
         /* Меняйте цвета ниже. Можно использовать HEX-коды или английские названия */
         /* ========================================================================= */
-:root {
-    --bg-color-1: #f8f9fa; /* Жемчужно-белый */
-    --bg-color-2: #8b0000; /* Глубокий темно-красный */
-    --bg-color-3: #d4af37; /* Металлическое золото */
-}
+         :root {
+         --bg-color-1: #f8f9fa; /* Жемчужно-белый */
+         --bg-color-2: #8b0000; /* Глубокий темно-красный */
+         --bg-color-3: #d4af37; /* Металлическое золото */
+        }
 
         .dynamic-bg {
             background: linear-gradient(-45deg, var(--bg-color-1), var(--bg-color-2), var(--bg-color-3), var(--bg-color-1));
@@ -135,7 +135,7 @@
         }
 
         /* 3. Большие шторки (Обо мне, Обучение, Услуги) - 80% */
-        #about-sheet, #training-sheet, #service-details-sheet {
+        #about-sheet, #training-sheet, #service-details-sheet, #program-details-sheet {
             height: calc(90vh + 150px) !important;
         }
 
@@ -244,9 +244,9 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0sRGRJ6AUUPV2x3bRlT34VyWOLwAyzpmBrvKf-yGXNr4qFN-kjOmnGH1UtwWTEYzh/exec"; 
 
         // Названия вкладок (листов) в твоей таблице:
-        const TAB_FIRE = "Огненные";
-        const TAB_ACRO = "Акробатика";
-        const TAB_CAMP = "Лагерь";
+        const TAB_FIRE = "Лагерь";
+        const TAB_ACRO = "Театр";
+        const TAB_CAMP = "Однодневные программы";
         const TAB_SERVICES = "Услуги";
         const TAB_REVIEWS_PUB = "Опубликованные отзывы"; 
         // Вкладка "Новые отзывы" будет прописана внутри самого Google Script!
@@ -256,7 +256,7 @@
             ru: {
                 profile: {
                     name: "Марина Жохова", 
-                    avatar: "https://i.postimg.cc/x8szLBzG/glavnaa.jpg", 
+                    avatar: "https://i.postimg.cc/VLRqMjHB/2026-03-23-21-15-58.jpg", 
                     bio: "Создаю пространство, где каждый ребенок — герой, а каждый взрослый — творец ✨"
                 },
                 about: {
@@ -270,31 +270,30 @@
                         "https://i.postimg.cc/x14MqkrG/2026-03-23-17-07-46.jpg",
                         "https://i.postimg.cc/fyKRdd63/2026-03-23-17-09-02.jpg"
                     ],
-                    text: "Я режиссёр и художественный руководитель необычного детского лагеря «Чайка. Новая цивилизация», где дети учатся самостоятельности, дружбе, творчеству.<br><br>По образованию филолог и учитель, в семье мама четверых детей. Разрабатываю и провожу интерактивные программы по народному календарю, городские и семейные праздники, сказочные дни рождения, большое место в жизни занимает детский театр, театральные интенсивы и сказки. Также занимаюсь женскими кругами, круговыми танцами народов мира, практикую фольклорное врачевание песней.<br><br>Создам красивый спектакль и праздник для вас или вместе с вами." 
+                    text: "Я режиссёр и соавтор необычного детского лагеря «Чайка. Новая цивилизация», где дети учатся самостоятельности, дружбе, творчеству.<br><br>По образованию филолог и учитель, в семье мама четверых детей. Разрабатываю и провожу интерактивные программы по народному календарю, городские и семейные праздники, сказочные дни рождения, большое место в жизни занимает детский театр, театральные интенсивы и сказки. Также занимаюсь женскими кругами, круговыми танцами народов мира, практикую фольклорное врачевание песней.<br><br>Создам красивый спектакль и праздник для вас или вместе с вами." 
                 },
                 categories: [
                     { 
-                        title: "Тест", 
-                        icon: "", badge: "Хит!", action: "posts",
+                        title: "Лагерь", 
+                        icon: "🏕️", badge: "Хит!", action: "posts",
                         posts: []
                     },
                     { 
-                        title: "Тест", 
-                        icon: "", badge: null, action: "posts",
+                        title: "Театр", 
+                        icon: "🎭", badge: null, action: "posts",
                         posts: []
                     },
                     { 
-                        title: "Тест", 
-                        icon: '<i class="ph-bold ph-tent"></i>', subtitle: "Летние смены", badge: "Лето 2026", action: "posts", type: "wide",
-                        posts: []
+                        title: "<span class='text-[14px] leading-tight'>Однодневные программы</span>", 
+                        icon: '<i class="ph-bold ph-sun"></i>', action: "programs", type: "wide"
                     },
                     { 
-                        title: "Тест", 
-                        icon: '<i class="ph-bold ph-graduation-cap"></i>', subtitle: "Индивидуальные занятия", badge: "Идет набор", action: "training", type: "wide"
+                        title: "Обучение", 
+                        icon: '<i class="ph-bold ph-graduation-cap"></i>', subtitle: "Онлайн курс", badge: "Идет набор", action: "training", type: "wide"
                     },
                     { 
-                        title: "Тест", 
-                        icon: '<i class="ph-bold ph-sparkle"></i>', subtitle: "Путь к совершенству тела", badge: "New!", action: "services", type: "wide"
+                        title: "Услуги", 
+                        icon: '<i class="ph-bold ph-sparkle"></i>', subtitle: "Путь к совершенству души", badge: "New!", action: "services", type: "wide"
                     }
                 ],
                 training: {
@@ -304,57 +303,59 @@
                     buttonLink: "https://vk.com/chiipolinka"
                 },
                 services: [],
+                programs: [],
                 fortunes: [
-                    { text: "Сегодня ты горишь ярче дедлайнов. Действуй!" },
-                    { text: "Искра, буря, безумие! Идеальный план на сегодня." },
-                    { text: "Если что-то идет не так — сделай сальто. Ситуация не изменится, но выглядеть будет эффектно." },
-                    { text: "Твой внутренний огонь сегодня согреет даже самых душных коллег." },
-                    { text: "Выдохни. Даже огню нужен кислород, чтобы гореть ярче." },
-                    { text: "Сегодня ты магнит для удачи. И для восторженных взглядов!" },
-                    { text: "Не жди подходящего момента, зажигай прямо сейчас." },
-                    { text: "Ты сегодня как бенгальский огонь — искришь и создаешь праздник!" },
-                    { text: "Гибкость — твое главное оружие. Подстройся под ситуацию и забери свое." },
-                    { text: "Звезды говорят: пора выпить кофе и пойти покорять этот мир." },
-                    { text: "Баланс — это не только про акробатику. Найди точку опоры и лети!" },
-                    { text: "Сегодня можно всё. Ну, почти всё. Главное — с улыбкой!" },
-                    { text: "Если закрывается одна дверь, открой её с ноги. Ты же можешь!" },
-                    { text: "Твоя энергия сегодня пробьет любой потолок. Осторожнее в помещениях!" },
-                    { text: "Секрет успеха на сегодня: улыбаемся и пашем. Но красиво!" },
-                    { text: "Ты не просто искра, ты — целый фейерверк возможностей." },
-                    { text: "Даже если страшно — шагай вперед. В крайнем случае скажешь, что так и было задумано." },
-                    { text: "Сегодня отличный день, чтобы стать чьей-то причиной для улыбки." },
-                    { text: "Оставь сомнения в прошлом. Впереди только свет софитов и аплодисменты." },
-                    { text: "Гори своим делом, но не выгорай. Водичку пей!" },
-                    { text: "Пластичность ума сегодня важнее шпагата. Хотя шпагат тоже не помешает." },
-                    { text: "В любой непонятной ситуации крути пои. Или хотя бы мысленно." },
-                    { text: "Сегодня твой день. Впрочем, как и всегда." },
-                    { text: "Риск — дело благородное, особенно когда ты знаешь, как правильно падать." },
-                    { text: "Спотыкаться можно, главное — делать из этого элегантное танцевальное па." },
-                    { text: "Зарядись позитивом: съешь вкусняшку и иди менять мир к лучшему." },
-                    { text: "Ты сегодня просто пушка, петарда, ракета! Лети к целям!" },
-                    { text: "Не пытайся быть нормальной. Быть уникальной гораздо веселее!" },
-                    { text: "Твой талант сжигать мосты сегодня не пригодится. А вот зажигать сердца — самое то!" },
-                    { text: "Сегодня удача на твоей стороне. Держи спину ровно и верь в себя." },
-                    { text: "Пусть твое настроение сегодня будет таким же горячим, как твое любимое шоу." },
-                    { text: "Сомнения — в мусорку. Ты всё можешь, я узнавала!" },
-                    { text: "Включай внутреннюю рок-звезду и иди наводить суету (в хорошем смысле)." },
-                    { text: "Сегодняшний день создан для твоих побед. Больших и маленьких." },
-                    { text: "Не бойся выделяться. Серости в этом мире и так хватает, добавь огня!" },
-                    { text: "Как говорил классик: «Вижу цель, не вижу препятствий». Это твой девиз на сегодня." },
-                    { text: "Если жизнь подкидывает лимоны — попроси еще текилу и соль." },
-                    { text: "Твоя харизма сегодня способна растопить ледники." },
-                    { text: "Помни: ты не странная, ты — лимитированная версия!" },
-                    { text: "Настрой на сегодня: максимум продуктивности, минимум стресса и чашечка вкусного чая." },
-                    { text: "Делай то, что любишь. Остальное приложится или отвалится за ненадобностью." },
-                    { text: "Сегодня ты — режиссер своей жизни. Снимай блокбастер!" },
-                    { text: "Держи баланс между «хочу» и «надо». И пусть «хочу» перевесит." },
-                    { text: "Твое призвание — сиять. Не смей выключать этот свет!" },
-                    { text: "Никаких оправданий. Только действия, только вперед!" },
+                    { text: "Пусть сегодня радость станет твоим главным компасом." },
+                    { text: "Счастье прячется в самых простых вещах. Заметь его." },
+                    { text: "Твоя улыбка — это свет, который меняет мир вокруг." },
+                    { text: "Сегодня — лучший день для маленького чуда." },
+                    { text: "Позволь себе сиять просто так, без повода." },
+                    { text: "Радость — это не пункт назначения, а способ путешествия." },
+                    { text: "Пусть каждое твоё «хочу» сегодня исполнится." },
+                    { text: "Вдохновение уже здесь, просто открой ему сердце." },
+                    { text: "Твой день — это чистый холст. Раскрась его ярко." },
+                    { text: "Наполни этот день благодарностью и свето." },
+                    { text: "В твоих руках — целый мир. Береги его тепло." },
+                    { text: "Быть мамой — значит быть соавтором самой жизни." },
+                    { text: "Твоя любовь — самый мощный оберег для твоих детей." },
+                    { text: "Сегодня позволь себе быть просто женщиной, а не только мамой." },
+                    { text: "В твоем сердце достаточно любви для всех, и для себя тоже." },
+                    { text: "Дети учатся не у нас, а об нас. Просто будь собой." },
+                    { text: "Материнство — это искусство находить радость в хаосе." },
+                    { text: "Помни: ты — лучшая мама для своих детей." },
+                    { text: "Твоя нежность строит фундамент их будущего." },
+                    { text: "Обними своих близких — в этом и есть настоящая сила." },
+                    { text: "Замедлись. Жизнь прекрасна в деталях." },
+                    { text: "Сегодня отдых — это не награда, а твоя базовая потребность." },
+                    { text: "Тишина — это лучший сценарий для сегодняшнего вечера." },
+                    { text: "Позволь себе роскошь просто быть здесь и сейчас." },
+                    { text: "Перезагрузка начинается с глубокого вдоха. Дыши." },
+                    { text: "Мир подождет, пока ты наполняешь свой ресурс." },
+                    { text: "Найди время для чашки чая в полной тишине." },
+                    { text: "Твоя продуктивность начинается с качественного сна." },
+                    { text: "Отпусти контроль. Доверься течению жизни." },
+                    { text: "Лучший проект, над которым ты когда-либо работала, — это ты." },
+                    { text: "В каждом из нас живет ребенок, верящий в чудо." },
+                    { text: "Посмотри на мир глазами ребенка — и увидишь магию." },
+                    { text: "Сказка начинается там, где заканчиваются сомнения." },
+                    { text: "Пусть сегодня твой внутренний ребенок вдоволь наиграется." },
+                    { text: "Дружба — это самый ценный клад из детских сказок." },
+                    { text: "Ты сама — автор своей самой красивой истории." },
+                    { text: "Смелость — это когда ты идешь навстречу своему приключению." },
+                    { text: "Творчество — это язык, на котором говорит твоя душа." },
+                    { text: "Сегодня день для того, чтобы верить в невозможное." },
+                    { text: "Пусть твое воображение не знает границ." },
+                    { text: "Твоя мягкость — это твоя самая большая сила." },
+                    { text: "Танцуй в ритме своего сердца, и мир подстроится." },
+                    { text: "Женский круг — это место, где твоя душа находит покой." },
+                    { text: "Ты — хранительница мудрости поколений. Помни об этом." },
+                    { text: "Пусть твоя внутренняя песня звучит сегодня громко." },
                     { text: "Вселенная шепчет: «У тебя всё получится». Прислушайся!" },
-                    { text: "Сегодня отличный день, чтобы похвалить себя. Ты молодец!" },
-                    { text: "Не обращай внимания на хейтеров. Они просто завидуют твоей растяжке и смелости." },
-                    { text: "Будь как огонь: согревай своих и обжигай тех, кто лезет без спроса." },
-                    { text: "Этот мир еще не готов к твоей грандиозности, но это его проблемы. Зажигай!" }
+                    { text: "Твоя интуиция — самый верный советчик. Прислушайся." },
+                    { text: "Гармония начинается изнутри." },
+                    { text: "Ты — воплощение природной красоты и грации." },
+                    { text: "Традиции — это корни, которые дают нам крылья." },
+                    { text: "Сияй изнутри, и ты осветишь путь другим." }
                 ],
                 reviews: [],
                 socials: {
@@ -364,7 +365,7 @@
                     aboutBtnTitle: "Давайте знакомиться", aboutBtnSub: "Моя история и путь",
                     reviewsTitle: "Отзывы", writeReview: "Написать отзыв",
                     fortuneBtnTitle: "Пожелание дня", fortuneBtnSub: "Получи заряд вдохновения",
-                    socialsTitle: "Мои социальные сети", servicesPageTitle: "Мои услуги",
+                    socialsTitle: "Мои социальные сети", servicesPageTitle: "Мои услуги", programsPageTitle: "Однодневные программы",
                     aboutSheetTitle: "Обо мне", trainingSheetTitle: "Обучение",
                     enrollBtn: "Записаться", fortuneSheetTitle: "Твое пожелание на день",
                     reviewSheetTitle: "Оставить отзыв", reviewNamePlaceholder: "Ваше имя",
@@ -377,7 +378,7 @@
             en: {
                 profile: {
                     name: "Marina Zhokhova", 
-                    avatar: "https://i.postimg.cc/x8szLBzG/glavnaa.jpg", 
+                    avatar: "https://i.postimg.cc/VLRqMjHB/2026-03-23-21-15-58.jpg", 
                     bio: "Creating a space where every child is a hero and every adult is a creator ✨"
                 },
                 about: {
@@ -391,30 +392,29 @@
                         "https://i.postimg.cc/x14MqkrG/2026-03-23-17-07-46.jpg",
                         "https://i.postimg.cc/fyKRdd63/2026-03-23-17-09-02.jpg"
                     ],
-                    text: "I am the Director and Artistic Lead<br />of the unique children’s camp 'Chaika. New Civilization',<br />where children learn independence, friendship, and creativity.<br /><br />A philologist and educator by training, and a mother of four,<br />I design and host interactive programs based on the folk calendar,<br />city-wide events, family celebrations, and fairy-tale birthdays.<br />Children’s theater, theatrical intensives, and storytelling<br />hold a special place in my life. I also facilitate women’s circles<br />and global folk dances, and practice the art of folk-song healing.<br /><br />I will create a beautiful performance or celebration<br />for you—or together with you." 
+                    text: "I am the Director and co-creator of the unique children’s camp 'Chaika. New Civilization',<br />where children learn independence, friendship, and creativity.<br /><br />A philologist and educator by training, and a mother of four,<br />I design and host interactive programs based on the folk calendar,<br />city-wide events, family celebrations, and fairy-tale birthdays.<br />Children’s theater, theatrical intensives, and storytelling<br />hold a special place in my life. I also facilitate women’s circles<br />and global folk dances, and practice the art of folk-song healing.<br /><br />I will create a beautiful performance or celebration<br />for you—or together with you." 
                 },
                 categories: [
                     { 
-                        title: "test", 
-                        icon: "", badge: "Hit!", action: "posts",
+                        title: "Camp", 
+                        icon: "🏕️", badge: "Hit!", action: "posts",
                         posts: []
                     },
                     { 
-                        title: "test", 
-                        icon: "", badge: null, action: "posts",
+                        title: "Theater", 
+                        icon: "🎭", badge: null, action: "posts",
                         posts: []
                     },
                     { 
-                        title: "test", 
-                        icon: '<i class="ph-bold ph-tent"></i>', subtitle: "Summer camp", badge: "Summer 2026", action: "posts", type: "wide",
-                        posts: []
+                        title: "<span class='text-[14px] leading-tight'>One-day programs</span>", 
+                        icon: '<i class="ph-bold ph-sun"></i>', action: "programs", type: "wide"
                     },
                     { 
-                        title: "test", 
+                        title: "Training", 
                         icon: '<i class="ph-bold ph-graduation-cap"></i>', subtitle: "Individual lessons", badge: "Hiring", action: "training", type: "wide"
                     },
                     { 
-                        title: "test", 
+                        title: "Services", 
                         icon: '<i class="ph-bold ph-sparkle"></i>', subtitle: "The path to body perfection", badge: "New!", action: "services", type: "wide"
                     }
                 ],
@@ -425,6 +425,7 @@
                     buttonLink: "https://vk.com/chiipolinka"
                 },
                 services: [],
+                programs: [],
                 fortunes: [
                     { text: "Today you burn brighter than deadlines. Take action!" },
                     { text: "Spark, storm, madness! The perfect plan for today." },
@@ -485,7 +486,7 @@
                     aboutBtnTitle: "Let's get acquainted", aboutBtnSub: "My story and journey",
                     reviewsTitle: "Reviews", writeReview: "Write a review",
                     fortuneBtnTitle: "Wish of the day", fortuneBtnSub: "Get inspired for the day",
-                    socialsTitle: "My social networks", servicesPageTitle: "My Services",
+                    socialsTitle: "My social networks", servicesPageTitle: "My Services", programsPageTitle: "One-day programs",
                     aboutSheetTitle: "About Me", trainingSheetTitle: "Training",
                     enrollBtn: "Sign up", fortuneSheetTitle: "Your wish for today",
                     reviewSheetTitle: "Leave a review", reviewNamePlaceholder: "Your name",
@@ -648,6 +649,24 @@
         </div>
     </div>
 
+    <!-- ============================================== -->
+    <!-- ЭКРАН "ОДНОДНЕВНЫЕ ПРОГРАММЫ" (Отдельная страница) -->
+    <!-- ============================================== -->
+    <div id="programs-screen" class="w-full max-w-md mx-auto space-y-6 hidden">
+        <!-- Кнопка назад и заголовок -->
+        <div class="flex items-center gap-4 mb-2">
+            <button onclick="closeProgramsPage()" class="w-12 h-12 rounded-full border border-white/20 shadow-sm bg-black/30 text-white flex items-center justify-center text-xl active:scale-95 transition-transform">
+                <i class="ph-bold ph-arrow-left"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-900 tracking-tight" id="ui-programs-page-title">Однодневные программы</h2>
+        </div>
+        
+        <!-- Список программ -->
+        <div id="programs-list" class="space-y-3 pb-8">
+            <!-- Сюда вставятся карточки программ -->
+        </div>
+    </div>
+
             </div> <!-- Конец app-scroll-container -->
 
     <!-- ============================================== -->
@@ -735,6 +754,37 @@
         <!-- Настоящая парящая кнопка ВНИЗУ (Абсолютное позиционирование поверх текста) -->
         <div class="absolute left-0 w-full px-6 z-20 pointer-events-none" style="bottom: calc(150px + env(safe-area-inset-bottom, 0px) + 32px);">
             <a id="service-sheet-btn" href="#" target="_blank" rel="noopener noreferrer" onclick="vkHaptic.impactOccurred('medium')" class="block w-full text-center bg-white text-black rounded-full py-4 px-6 font-bold text-[15px] shadow-[0_10px_40px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform pointer-events-auto">
+                Записаться
+            </a>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- ШТОРКА "ОПИСАНИЕ ПРОГРАММЫ" -->
+    <!-- ============================================== -->
+    <div id="program-details-sheet" class="fixed md:absolute bottom-0 left-0 w-full bg-black/45 backdrop-blur-2xl border-t border-white/10 rounded-t-[2.5rem] z-50 transform sheet-hidden transition-transform duration-300 flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.4)]">
+        <div class="w-full flex justify-center py-4 drag-handle shrink-0" onclick="closeSheet()">
+            <div class="w-14 h-1.5 bg-white/30 rounded-full"></div>
+        </div>
+        <button onclick="closeSheet()" class="absolute top-4 right-6 text-white/30 hover:text-white/80 p-2 z-10 active:scale-95 transition-all"><i class="ph-bold ph-x text-[20px]"></i></button>
+        
+        <!-- Блок с текстом: увеличен нижний отступ (pb-32), чтобы текст можно было доскроллить до конца из-под кнопки -->
+        <div class="overflow-y-auto px-6 pb-32 custom-scrollbar flex-1 min-h-0">
+            <h2 id="program-sheet-title" class="text-2xl font-bold mb-5 tracking-tight text-white leading-tight"></h2>
+            <!-- Галерея вместо статичного фото -->
+            <div id="program-gallery-container"></div>
+            
+            <div class="flex items-baseline gap-3 mb-5 px-1">
+                <span id="program-sheet-new-price" class="text-white font-extrabold text-[28px] drop-shadow-md tracking-tight"></span>
+                <span id="program-sheet-old-price" class="text-gray-400 font-medium text-[16px] line-through"></span>
+            </div>
+
+            <div id="program-sheet-desc" class="text-gray-200 space-y-3 leading-relaxed text-[15px] font-medium mb-4"></div>
+        </div>
+        
+        <!-- Настоящая парящая кнопка ВНИЗУ (Абсолютное позиционирование поверх текста) -->
+        <div class="absolute left-0 w-full px-6 z-20 pointer-events-none" style="bottom: calc(150px + env(safe-area-inset-bottom, 0px) + 32px);">
+            <a id="program-sheet-btn" href="#" target="_blank" rel="noopener noreferrer" onclick="vkHaptic.impactOccurred('medium')" class="block w-full text-center bg-white text-black rounded-full py-4 px-6 font-bold text-[15px] shadow-[0_10px_40px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-transform pointer-events-auto">
                 Записаться
             </a>
         </div>
@@ -867,6 +917,7 @@
             document.getElementById('ui-fortune-btn-sub').textContent = CONFIG.ui.fortuneBtnSub;
             document.getElementById('ui-socials-title').textContent = CONFIG.ui.socialsTitle;
             document.getElementById('ui-services-page-title').textContent = CONFIG.ui.servicesPageTitle;
+            document.getElementById('ui-programs-page-title').textContent = CONFIG.ui.programsPageTitle;
             document.getElementById('ui-about-sheet-title').textContent = CONFIG.ui.aboutSheetTitle;
             document.getElementById('ui-training-sheet-title').textContent = CONFIG.ui.trainingSheetTitle;
             document.getElementById('training-btn').textContent = CONFIG.ui.enrollBtn;
@@ -903,6 +954,7 @@
                 let onClickAction = `openPostsSheet(${index})`;
                 if (item.action === 'training') onClickAction = `openTrainingSheet()`;
                 if (item.action === 'services') onClickAction = `openServicesPage()`;
+                if (item.action === 'programs') onClickAction = `openProgramsPage()`;
 
                 if (item.type === 'wide') {
                     const badgeHtml = item.badge 
@@ -971,6 +1023,38 @@
                 `;
             });
 
+            // Рендер списка программ для отдельной страницы
+            const programsList = document.getElementById('programs-list');
+            programsList.innerHTML = '';
+            if (CONFIG.programs) {
+                CONFIG.programs.forEach((p, index) => {
+                    const thumb = p.photos && p.photos.length > 0 ? p.photos[0] : p.photo;
+                    programsList.innerHTML += `
+                        <div class="card-shadow rounded-[2rem] p-4 flex flex-col gap-4 active:scale-[0.98] transition-transform text-left cursor-pointer" onclick="openProgramDetails(${index})">
+                            <!-- Большое фото на всю ширину карточки -->
+                            <img src="${thumb}" class="w-full h-48 md:h-56 rounded-2xl object-cover shadow-lg border border-white/10" onerror="this.style.display='none'">
+                            
+                            <!-- Блок с текстом и кнопками -->
+                            <div class="flex flex-col flex-grow">
+                                <h3 class="text-white font-bold text-[16px] mb-2 leading-tight">${p.title}</h3>
+                                <p class="text-gray-300 text-[12px] line-clamp-3 leading-relaxed mb-4">${(p.shortDesc || '').replace(/\n/g, '<br>')}</p>
+                                
+                                <!-- Подвал карточки: цена и кнопка (прижаты к низу) -->
+                                <div class="flex items-end justify-between mt-auto pt-4 border-t border-white/10">
+                                    <div class="flex flex-col">
+                                        ${p.oldPrice ? `<span class="text-gray-400 text-[11px] line-through leading-none mb-1">${p.oldPrice}</span>` : ''}
+                                        <span class="text-white font-black text-[18px] leading-none drop-shadow-md">${p.newPrice}</span>
+                                    </div>
+                                    <div class="text-[12px] font-bold text-white bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-lg flex items-center gap-1">
+                                        ${CONFIG.ui.moreBtn} <i class="ph-bold ph-caret-right"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
             // Рендер карусели отзывов (Премиальные стеклянные плашки)
             const reviewsContainer = document.getElementById('reviews-container');
             reviewsContainer.innerHTML = '';
@@ -1021,7 +1105,7 @@
             const langBtn = document.getElementById('lang-btn');
             
             // Находим главные экраны для эффекта плавного затухания
-            const screens = [document.getElementById('main-screen'), document.getElementById('services-screen')];
+            const screens = [document.getElementById('main-screen'), document.getElementById('services-screen'), document.getElementById('programs-screen')];
             
             // Плавно прячем контент
             screens.forEach(s => { 
@@ -1187,6 +1271,67 @@
 
         // --- ЛОГИКА ОТКРЫТИЯ ЭКРАНОВ И ШТОРОК ---
 
+        // Открытие страницы Однодневных программ
+        function openProgramsPage() {
+            vkHaptic.impactOccurred('light');
+            document.getElementById('main-screen').classList.add('hidden');
+            const programsScreen = document.getElementById('programs-screen');
+            programsScreen.classList.remove('hidden');
+            programsScreen.classList.add('fade-in');
+            window.scrollTo(0, 0);
+            const scrollContainer = document.getElementById('app-scroll-container');
+            if (scrollContainer) scrollContainer.scrollTo(0, 0);
+        }
+
+        // Закрытие страницы Однодневных программ
+        function closeProgramsPage() {
+            vkHaptic.impactOccurred('light');
+            document.getElementById('programs-screen').classList.add('hidden');
+            document.getElementById('main-screen').classList.remove('hidden');
+            window.scrollTo(0, 0);
+            const scrollContainer = document.getElementById('app-scroll-container');
+            if (scrollContainer) scrollContainer.scrollTo(0, 0);
+        }
+
+        // Открытие шторки с конкретной программой
+        function openProgramDetails(index) {
+            vkHaptic.impactOccurred('light');
+            lockScroll();
+
+            const program = CONFIG.programs[index];
+            document.getElementById('program-sheet-title').textContent = program.title;
+            renderGallery('program-gallery-container', program.photos || [program.photo]);
+            document.getElementById('program-sheet-desc').innerHTML = (program.fullDesc || '').replace(/\n/g, '<br>');
+            document.getElementById('program-sheet-new-price').textContent = program.newPrice;
+            document.getElementById('program-sheet-old-price').textContent = program.oldPrice || '';
+            
+            // Формируем умную ссылку с готовым сообщением для Программ
+            let servLink = program.buttonLink || '#';
+            servLink = String(servLink).trim();
+            
+            if (servLink.startsWith('@')) {
+                servLink = 'https://vk.com/' + servLink.substring(1);
+            } else if ((servLink.includes('vk.com') || servLink.includes('vk.me')) && !servLink.startsWith('http')) {
+                servLink = 'https://' + servLink;
+            }
+            
+            const btn = document.getElementById('program-sheet-btn');
+            btn.href = servLink;
+            
+            btn.onclick = function(e) {
+                openWithBlurGuide(e, this.href);
+            };
+
+            const sheet = document.getElementById('program-details-sheet');
+            const overlay = document.getElementById('sheet-overlay');
+
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                sheet.classList.remove('sheet-hidden');
+            }, 10);
+        }
+
         // Открытие страницы Услуг
         function openServicesPage() {
             vkHaptic.impactOccurred('light');
@@ -1323,6 +1468,7 @@
             const postsSheet = document.getElementById('posts-sheet');
             const trainingSheet = document.getElementById('training-sheet');
             const serviceDetailsSheet = document.getElementById('service-details-sheet');
+            const programDetailsSheet = document.getElementById('program-details-sheet');
             const fortuneSheet = document.getElementById('fortune-sheet');
             const reviewSheet = document.getElementById('review-sheet');
             const overlay = document.getElementById('sheet-overlay');
@@ -1332,6 +1478,7 @@
             postsSheet.classList.add('sheet-hidden');
             trainingSheet.classList.add('sheet-hidden');
             serviceDetailsSheet.classList.add('sheet-hidden');
+            programDetailsSheet.classList.add('sheet-hidden');
             fortuneSheet.classList.add('sheet-hidden');
             reviewSheet.classList.add('sheet-hidden');
             
@@ -1529,7 +1676,7 @@
                         })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
                     }
 
-                    // Обновляем Акробатику
+                    // Обновляем Театр
                     if (acroRows && acroRows.length > 0) {
                         APP_DATA.ru.categories[1].posts = acroRows.map(row => ({
                             title: row.c[0] ? String(row.c[0].v) : "", link: row.c[2] ? String(row.c[2].v) : "#"
@@ -1540,15 +1687,32 @@
                         })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
                     }
 
-                    // Обновляем Лагерь
+                    // Обновляем Лагерь (теперь это Однодневные программы, формат как у Услуг)
                     if (campRows && campRows.length > 0) {
-                        APP_DATA.ru.categories[2].posts = campRows.map(row => ({
-                            title: row.c[0] ? String(row.c[0].v) : "", link: row.c[2] ? String(row.c[2].v) : "#"
-                        })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
+                        APP_DATA.ru.programs = campRows.map(row => {
+                            const photosStr = row.c[9] ? String(row.c[9].v) : "";
+                            const photosArr = photosStr ? photosStr.split(',').map(s => s.trim()) : [];
+                            return {
+                                title: row.c[0] ? String(row.c[0].v) : "", shortDesc: row.c[2] ? String(row.c[2].v) : "",
+                                fullDesc: row.c[4] ? String(row.c[4].v) : "", oldPrice: row.c[6] ? String(row.c[6].v) : "",
+                                newPrice: row.c[7] ? String(row.c[7].v) : "", buttonLink: row.c[8] ? String(row.c[8].v) : "#",
+                                photo: photosArr.length > 0 ? photosArr[0] : "", photos: photosArr
+                            };
+                        }).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
                         
-                        APP_DATA.en.categories[2].posts = campRows.map(row => ({
-                            title: row.c[1] ? String(row.c[1].v) : (row.c[0] ? String(row.c[0].v) : ""), link: row.c[2] ? String(row.c[2].v) : "#"
-                        })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
+                        APP_DATA.en.programs = campRows.map(row => {
+                            const photosStr = row.c[9] ? String(row.c[9].v) : "";
+                            const photosArr = photosStr ? photosStr.split(',').map(s => s.trim()) : [];
+                            return {
+                                title: row.c[1] ? String(row.c[1].v) : (row.c[0] ? String(row.c[0].v) : ""), 
+                                shortDesc: row.c[3] ? String(row.c[3].v) : (row.c[2] ? String(row.c[2].v) : ""),
+                                fullDesc: row.c[5] ? String(row.c[5].v) : (row.c[4] ? String(row.c[4].v) : ""), 
+                                oldPrice: row.c[6] ? String(row.c[6].v) : "",
+                                newPrice: row.c[7] ? String(row.c[7].v) : "", 
+                                buttonLink: row.c[8] ? String(row.c[8].v) : "#",
+                                photo: photosArr.length > 0 ? photosArr[0] : "", photos: photosArr
+                            };
+                        }).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
                     }
 
                     // Обновляем Услуги
