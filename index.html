@@ -180,12 +180,12 @@
 <!-- Добавлено min-h-[100dvh] для идеального прилегания к экрану на мобильных (убирает щели снизу) -->
 <body class="dynamic-bg min-h-screen min-h-[100dvh] flex items-center justify-center p-0 md:p-6 overflow-x-hidden">
 
-    <!-- ЗАГРУЗОЧНЫЙ ЭКРАН (Огненный лоадер) -->
+    <!-- ЗАГРУЗОЧНЫЙ ЭКРАН (Элегантный лоадер) -->
     <div id="app-loader" class="fixed inset-0 z-[100] dynamic-bg flex items-center justify-center transition-opacity duration-500">
         <div class="relative w-20 h-20 flex items-center justify-center">
-            <div class="absolute inset-0 rounded-full border-4 border-orange-500/20"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-orange-500 border-r-red-500 border-b-yellow-400 animate-spin shadow-[0_0_30px_rgba(249,115,22,0.6)]"></div>
-            <i class="ph-fill ph-fire text-orange-500 text-3xl animate-pulse"></i>
+            <div class="absolute inset-0 rounded-full border-4 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)]"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-[#d4af37] border-r-[#d4af37] animate-[spin_1.5s_linear_infinite] shadow-[0_0_20px_rgba(212,175,55,0.4)]"></div>
+            <i class="ph-fill ph-sparkle text-[#d4af37] text-3xl animate-pulse"></i>
         </div>
     </div>
 
@@ -362,7 +362,8 @@
                     enrollBtn: "Записаться", fortuneSheetTitle: "Твое пожелание на день",
                     reviewSheetTitle: "Оставить отзыв", reviewNamePlaceholder: "Ваше имя",
                     reviewTextPlaceholder: "Поделитесь впечатлениями...", reviewSubmitBtn: "Отправить отзыв",
-                    moreBtn: "Подробнее", toastSuccess: "Отзыв успешно отправлен! 💖", toastWarning: "Пожалуйста, поставьте оценку"
+                    moreBtn: "Подробнее", toastSuccess: "Отзыв успешно отправлен! 💖", toastWarning: "Пожалуйста, поставьте оценку",
+                    successModalTitle: "Отзыв отправлен!", successModalDesc: "Спасибо за ваши теплые слова. Отзыв скоро появится на странице после проверки.", successModalBtn: "Отлично"
                 }
             },
 
@@ -485,7 +486,8 @@
                     enrollBtn: "Sign up", fortuneSheetTitle: "Your wish for today",
                     reviewSheetTitle: "Leave a review", reviewNamePlaceholder: "Your name",
                     reviewTextPlaceholder: "Share your impressions...", reviewSubmitBtn: "Submit Review",
-                    moreBtn: "Details", toastSuccess: "Review sent successfully! 💖", toastWarning: "Please rate us with stars"
+                    moreBtn: "Details", toastSuccess: "Review sent successfully! 💖", toastWarning: "Please rate us with stars",
+                    successModalTitle: "Review submitted!", successModalDesc: "Thank you for your warm words. The review will appear on the page soon after verification.", successModalBtn: "Great"
                 }
             }
         };
@@ -832,6 +834,22 @@
         </div>
     </div>
 
+    <!-- ============================================== -->
+    <!-- МОДАЛЬНОЕ ОКНО УСПЕШНОГО ОТЗЫВА -->
+    <!-- ============================================== -->
+    <div id="success-modal-overlay" class="fixed md:absolute inset-0 bg-black/60 backdrop-blur-md z-[120] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center px-6">
+        <div id="success-modal-content" class="bg-black/60 backdrop-blur-2xl border border-white/20 rounded-[2rem] p-8 text-center shadow-[0_20px_60px_rgba(0,0,0,0.6)] transform scale-95 opacity-0 transition-all duration-300 w-full max-w-[320px]">
+            <div class="w-16 h-16 rounded-full bg-[#d4af37]/20 border border-[#d4af37]/30 flex items-center justify-center mx-auto mb-5 shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+                <i class="ph-bold ph-check text-3xl text-[#d4af37]"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2" id="ui-success-modal-title">Отзыв отправлен!</h3>
+            <p class="text-[14px] text-gray-300 font-medium mb-6 leading-relaxed" id="ui-success-modal-desc">Спасибо за ваши теплые слова. Отзыв скоро появится на странице после проверки.</p>
+            <button onclick="closeSuccessModal()" id="success-modal-btn" class="w-full bg-white text-black font-bold py-3.5 rounded-full text-[15px] active:scale-95 transition-transform shadow-[0_10px_30px_rgba(255,255,255,0.2)]">
+                Отлично
+            </button>
+        </div>
+    </div>
+
         </div> <!-- Конец MOBILE APP CONTAINER -->
 
         <!-- ============================================== -->
@@ -938,6 +956,9 @@
             document.getElementById('review-input-name').placeholder = CONFIG.ui.reviewNamePlaceholder;
             document.getElementById('review-input-text').placeholder = CONFIG.ui.reviewTextPlaceholder;
             document.getElementById('review-submit-btn').textContent = CONFIG.ui.reviewSubmitBtn;
+            document.getElementById('ui-success-modal-title').textContent = CONFIG.ui.successModalTitle;
+            document.getElementById('ui-success-modal-desc').textContent = CONFIG.ui.successModalDesc;
+            document.getElementById('success-modal-btn').textContent = CONFIG.ui.successModalBtn;
 
             // Настройки разработчика (Твой копирайт)
             document.getElementById('developer-link-el').href = MY_DEVELOPER_LINK;
@@ -1256,8 +1277,40 @@
                 } catch(e) { console.log('Ошибка отправки отзыва', e); }
             }
 
-            showToast(CONFIG.ui.toastSuccess, 'ph-fill ph-heart');
             closeSheet();
+            
+            // Открываем модальное окно успеха с небольшой задержкой (после закрытия шторки)
+            setTimeout(() => {
+                openSuccessModal();
+            }, 300);
+        }
+
+        function openSuccessModal() {
+            vkHaptic.notificationOccurred('success');
+            const overlay = document.getElementById('success-modal-overlay');
+            const content = document.getElementById('success-modal-content');
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeSuccessModal() {
+            vkHaptic.impactOccurred('light');
+            const overlay = document.getElementById('success-modal-overlay');
+            const content = document.getElementById('success-modal-content');
+            
+            overlay.classList.remove('opacity-100');
+            overlay.classList.add('opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
         }
 
         // Открытие шторки Предсказания
