@@ -278,10 +278,11 @@
                     }
                 ],
                 training: {
-                    photo: "https://i.postimg.cc/x14MqkrG/2026-03-23-17-07-46.jpg", 
-                    text: "Полное описание",
+                    photo: "https://i.postimg.cc/QtPb4P98/1.jpg", 
+                    photo_2: "https://i.postimg.cc/K8F5Htz3/2.jpg",
+                    text: "Обучение проведению массовых, семейных, детских праздников<br />на все случаи жизни.<br /><br />«Ключи. Материалы. Сценарии.» — это готовая система<br />для создания праздников.<br />К каждому сценарию приложена подборка игр, музыки,<br />чек-листы по реквизиту и костюмам.<br /><br />Вы получите структуру любого праздника: от зачина до финала,<br />с секретами интерактива, чтобы удержать внимание участников.<br /><br />Приходите за готовыми инструментами,<br />чтобы проводить праздники с душой и легкостью! ✨",
                     // 👇 ВСТАВЬ СВОЮ ССЫЛКУ НА КУРС В КАВЫЧКИ НИЖЕ 👇
-                    buttonLink: "https://vk.com/chiipolinka"
+                    buttonLink: "https://vk.com/maris74"
                 },
                 services: [],
                 programs: [],
@@ -403,7 +404,7 @@
                     photo: "https://i.postimg.cc/x14MqkrG/2026-03-23-17-07-46.jpg", 
                     text: "Полное описание на английском",
                     // 👇 ВСТАВЬ СВОЮ ССЫЛКУ НА КУРС В КАВЫЧКИ НИЖЕ 👇
-                    buttonLink: "https://vk.com/chiipolinka"
+                    buttonLink: "https://vk.com/maris74"
                 },
                 services: [],
                 programs: [],
@@ -697,7 +698,8 @@
         <!-- Блок с текстом: увеличен нижний отступ (pb-32), чтобы текст можно было доскроллить до конца из-под кнопки -->
         <div class="overflow-y-auto px-6 pb-32 custom-scrollbar flex-1 min-h-0">
             <h2 class="text-2xl font-bold mb-5 tracking-tight text-white" id="ui-training-sheet-title">Обучение</h2>
-            <img id="training-photo" src="" alt="Training" class="w-full aspect-square object-contain bg-black/20 rounded-[2rem] mb-5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+            <!-- Галерея вместо статичного фото -->
+            <div id="training-gallery-container"></div>
             <div id="training-text" class="text-gray-200 space-y-3 leading-relaxed text-[15px] font-medium mb-4"></div>
         </div>
 
@@ -1355,7 +1357,15 @@
             vkHaptic.impactOccurred('light');
             lockScroll(); 
 
-            document.getElementById('training-photo').src = CONFIG.training.photo;
+            let trainingPhotos = [];
+            if (CONFIG.training.photos) {
+                trainingPhotos = CONFIG.training.photos;
+            } else {
+                if (CONFIG.training.photo) trainingPhotos.push(CONFIG.training.photo);
+                if (CONFIG.training.photo_2) trainingPhotos.push(CONFIG.training.photo_2);
+            }
+            renderGallery('training-gallery-container', trainingPhotos);
+            
             document.getElementById('training-text').innerHTML = (CONFIG.training.text || '').replace(/\n/g, '<br>');
             
             const btn = document.getElementById('training-btn');
