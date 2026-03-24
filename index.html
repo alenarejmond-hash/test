@@ -155,8 +155,8 @@
             height: calc(50vh + 150px) !important;
         }
 
-        /* 1. Компактные шторки (Отзывы, Предсказания) - по размеру контента */
-        #fortune-sheet, #review-sheet {
+        /* 1. Компактные шторки (Отзывы, Предсказания, Лагерь VIP) - по размеру контента */
+        #fortune-sheet, #review-sheet, #camp-sheet {
             height: auto !important;
             max-height: calc(95vh + 150px) !important;
         }
@@ -194,9 +194,9 @@
     <!-- ========================================================================= -->
     <script>
         // ==========================================
-        // 🔗 ЕДИНАЯ ССЫЛКА ДЛЯ ВСЕХ РАЗДЕЛОВ (Лагерь, Театр, Обучение, Программы, Услуги) 🔗
+        // 🔗 ЕДИНАЯ ССЫЛКА ДЛЯ ВСЕХ РАЗДЕЛОВ (Театр, Обучение, Программы, Услуги) 🔗
         // ==========================================
-        // 👇 ЗДЕСЬ ТЫ МОЖЕШЬ ИЗМЕНИТЬ ССЫЛКУ САМА (Она применится ко всем кнопкам) 👇
+        // 👇 ЗДЕСЬ ТЫ МОЖЕШЬ ИЗМЕНИТЬ ССЫЛКУ САМА 👇
         const GLOBAL_ACTION_LINK = "https://vk.ru/maris74";
 
         // ==========================================
@@ -206,21 +206,10 @@
         const MY_DEVELOPER_LINK = "https://nice-app.ru"; // Ссылка на личку
 
         // ==========================================
-        // 💬 ШАБЛОНЫ СООБЩЕНИЙ ДЛЯ КНОПОК "ЗАПИСАТЬСЯ" 💬
-        // ==========================================
-        // Текст для кнопки в разделе "Обучение"
-        const MSG_TRAINING_RU = "Здравствуйте! Расскажите, пожалуйста, подробнее о курсе.";
-        const MSG_TRAINING_EN = "Hello! Could you please tell me more about the course.";
-        
-        // Текст для кнопки в разделе "Мои услуги" (название услуги подставится автоматически!)
-        const MSG_SERVICE_RU = "Здравствуйте! Меня заинтересовала ваша услуга:";
-        const MSG_SERVICE_EN = "Hello! I am interested in your service:";
-
-        // ==========================================
         // 🖥️ НАСТРОЙКИ ДЛЯ ПК ВЕРСИИ (DESKTOP СТЕНД) 🖥️
         // ==========================================
         const DESKTOP_TITLE = "";
-        const DESKTOP_DESC = "Открой Smart-визитку на смартфоне, чтобы почувствовать магию 3D-эффектов, плавных анимаций и тактильного отклика.";
+        const DESKTOP_DESC = "Открой Smart-визитку на смартфоне, чтобы почувствовать магию 3D-эффектов и плавных анимаций.";
         const DESKTOP_QR_LINK = "https://more.nice-app.ru"; // Ссылка для QR-кода
 
         // ==========================================
@@ -234,9 +223,7 @@
         // (Он нужен для того, чтобы отправлять отзывы во вкладку "Новые отзывы")
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0sRGRJ6AUUPV2x3bRlT34VyWOLwAyzpmBrvKf-yGXNr4qFN-kjOmnGH1UtwWTEYzh/exec"; 
 
-        // Названия вкладок (листов) в твоей таблице:
-        const TAB_FIRE = "Лагерь";
-        const TAB_ACRO = "Театр";
+        // Названия вкладок (листов) в твоей таблице (УДАЛЕН ЛАГЕРЬ ЗА НЕНАДОБНОСТЬЮ):
         const TAB_CAMP = "Однодневные программы";
         const TAB_SERVICES = "Услуги";
         const TAB_REVIEWS_PUB = "Опубликованные отзывы"; 
@@ -266,7 +253,7 @@
                 categories: [
                     { 
                         title: "Лагерь", 
-                        icon: "🏕️", badge: "Хит!", action: "posts",
+                        icon: "🏕️", badge: "Хит!", action: "camp",
                         posts: []
                     },
                     { 
@@ -287,6 +274,28 @@
                         icon: '<i class="ph-bold ph-sparkle"></i>', subtitle: "Путь к совершенству души", badge: "New!", action: "services", type: "wide"
                     }
                 ],
+                // 👇 НАСТРОЙКИ ДЛЯ НОВОГО VIP-МЕНЮ "ЛАГЕРЬ" 👇
+                camp: {
+                    title: "Выбор формата",
+                    desc: "Мы создаем незабываемые эмоции и пространства для всех возрастов. Выберите подходящий вам формат:",
+                    options: [
+                        { 
+                            title: "Детский лагерь", 
+                            icon: '<i class="ph-bold ph-rocket-launch text-[#d4af37]"></i>', 
+                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках для Детского лагеря (если нужно)
+                        },
+                        { 
+                            title: "Семейный лагерь", 
+                            icon: '<i class="ph-bold ph-users-three text-[#d4af37]"></i>', 
+                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках для Семейного лагеря (если нужно)
+                        },
+                        { 
+                            title: "Лагерь для взрослых", 
+                            icon: '<i class="ph-bold ph-mountains text-[#d4af37]"></i>', 
+                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках для Взрослого лагеря (если нужно)
+                        }
+                    ]
+                },
                 // 👇 НАСТРОЙКИ ДЛЯ НОВОЙ ВАУ-ШТОРКИ "ТЕАТР" 👇
                 theater: {
                     photos: [
@@ -299,15 +308,13 @@
                         // Можно добавить больше фоток через запятую!
                     ],
                     // 👈 Ниже текст для шторки театра
-                    text: "<br>Театральная студия 'Мариiнка'</br>Создаем и показываем удивительные и волшебные спектакли!<br>25-кратные победители международных конкурсов в разных номинациях!</br><br>На протяжении 20 лет мы помогаем детям стать увереннее в себе, развить артистизм и научиться работать в команде.</br><br>Всего за 7 дней ваш ребенок подготовит представление, в котором сможет проявить себя и по-настоящему поразить своих родителей и зрителей.<br></br>Все это происходит под руководством опытных педагогов, во вдохновляющей и поддерживающей обстановке с помощью метода погружения.<br></br>Пригласите нас, или приезжайте к нам, и мы подарим вам самые яркие и незабываемые воспоминания! Позвольте вашему ребенку сиять!",
+                    text: "Театральная студия 'Мариiнка'<br></br>Создаем и показываем удивительные и волшебные спектакли!<br>25-кратные победители международных конкурсов в разных номинациях!</br><br>На протяжении 20 лет мы помогаем детям стать увереннее в себе, развить артистизм и научиться работать в команде.</br><br>Всего за 7 дней ваш ребенок подготовит представление, в котором сможет проявить себя и по-настоящему поразить своих родителей и зрителей.<br></br>Все это происходит под руководством опытных педагогов, во вдохновляющей и поддерживающей обстановке с помощью метода погружения.<br></br>Пригласите нас, или приезжайте к нам, и мы подарим вам самые яркие и незабываемые воспоминания! Позвольте вашему ребенку сиять!",
                     btnText: "Погрузиться в мир театра" // Текст на золотой кнопке
                 },
                 training: {
                     photo: "https://i.postimg.cc/QtPb4P98/1.jpg", 
                     photo_2: "https://i.postimg.cc/K8F5Htz3/2.jpg",
-                    text: "Обучение проведению массовых, семейных, детских праздников<br />на все случаи жизни.<br /><br />«Ключи. Материалы. Сценарии.» — это готовая система<br />для создания праздников.<br />К каждому сценарию приложена подборка игр, музыки,<br />чек-листы по реквизиту и костюмам.<br /><br />Вы получите структуру любого праздника: от зачина до финала,<br />с секретами интерактива, чтобы удержать внимание участников.<br /><br />Приходите за готовыми инструментами,<br />чтобы проводить праздники с душой и легкостью! ✨",
-                    // 👇 ВСТАВЬ СВОЮ ССЫЛКУ НА КУРС В КАВЫЧКИ НИЖЕ 👇
-                    buttonLink: "https://vk.com/maris74"
+                    text: "Обучение проведению массовых, семейных, детских праздников<br />на все случаи жизни.<br /><br />«Ключи. Материалы. Сценарии.» — это готовая система<br />для создания праздников.<br />К каждому сценарию приложена подборка игр, музыки,<br />чек-листы по реквизиту и костюмам.<br /><br />Вы получите структуру любого праздника: от зачина до финала,<br />с секретами интерактива, чтобы удержать внимание участников.<br /><br />Приходите за готовыми инструментами,<br />чтобы проводить праздники с душой и легкостью! ✨"
                 },
                 services: [],
                 programs: [],
@@ -378,7 +385,8 @@
                     reviewSheetTitle: "Оставить отзыв", reviewNamePlaceholder: "Ваше имя",
                     reviewTextPlaceholder: "Поделитесь впечатлениями...", reviewSubmitBtn: "Отправить отзыв",
                     moreBtn: "Подробнее", toastSuccess: "Отзыв успешно отправлен! 💖", toastWarning: "Пожалуйста, поставьте оценку",
-                    successModalTitle: "Отзыв отправлен!", successModalDesc: "Спасибо за ваши теплые слова. Отзыв скоро появится на странице после проверки.", successModalBtn: "Отлично"
+                    successModalTitle: "Отзыв отправлен!", successModalDesc: "Спасибо за ваши теплые слова. Отзыв скоро появится на странице после проверки.", successModalBtn: "Отлично",
+                    socialVk: "ВКонтакте", socialTheater: "Театр", socialCamp: "Лагерь"
                 }
             },
 
@@ -400,12 +408,12 @@
                         "https://i.postimg.cc/x14MqkrG/2026-03-23-17-07-46.jpg",
                         "https://i.postimg.cc/fyKRdd63/2026-03-23-17-09-02.jpg"
                     ],
-                    text: "I am a director and co-creator of the unique children's camp 'Chaika. New Civilization', where children learn independence, friendship, and creativity.<br><br>By education, I am a philologist and teacher, and a mother of four children in my family. I develop and host interactive programs based on the folk calendar, city and family holidays, and fairy-tale birthdays. Children's theater, theatrical intensives, and fairy tales hold a special place in my life. I also organize women's circles, circle dances of the peoples of the world, and practice folklore healing through song.<br><br>I will create a beautiful performance and holiday for you or together with you." 
+                    text: "I am a director and co-creator of the unique children's camp 'Chaika. New Civilization', where children learn independence, friendship, and creativity.<br><br>By education, I am a philologist and a teacher, and a mother of four. I develop and host interactive programs based on the folk calendar, city and family holidays, and fairy-tale birthdays. Children's theater, theatrical intensives, and fairy tales hold a special place in my life. I also organize women's circles, circle dances of the peoples of the world, and practice folk healing through song.<br><br>I will create a beautiful performance and holiday for you or together with you." 
                 },
                 categories: [
                     { 
                         title: "Camp", 
-                        icon: "🏕️", badge: "Hit!", action: "posts",
+                        icon: "🏕️", badge: "Hit!", action: "camp",
                         posts: []
                     },
                     { 
@@ -426,22 +434,46 @@
                         icon: '<i class="ph-bold ph-sparkle"></i>', subtitle: "Path to soul perfection", badge: "New!", action: "services", type: "wide"
                     }
                 ],
+                // 👇 НАСТРОЙКИ ДЛЯ НОВОГО VIP-МЕНЮ "ЛАГЕРЬ" (АНГЛИЙСКИЙ) 👇
+                camp: {
+                    title: "Choose a format",
+                    desc: "We create unforgettable emotions and spaces for all ages. Choose the format that suits you:",
+                    options: [
+                        { 
+                            title: "Children's Camp", 
+                            icon: '<i class="ph-bold ph-rocket-launch text-[#d4af37]"></i>', 
+                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках
+                        },
+                        { 
+                            title: "Family Camp", 
+                            icon: '<i class="ph-bold ph-users-three text-[#d4af37]"></i>', 
+                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках
+                        },
+                        { 
+                            title: "Adult Camp", 
+                            icon: '<i class="ph-bold ph-mountains text-[#d4af37]"></i>', 
+                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках
+                        }
+                    ]
+                },
                 // 👇 НАСТРОЙКИ ДЛЯ НОВОЙ ВАУ-ШТОРКИ "ТЕАТР" (АНГЛИЙСКИЙ) 👇
                 theater: {
                     photos: [
-                        "https://i.postimg.cc/CLsqCBjj/2026-03-23-17-08-01.jpg", // 👈 Вставь ссылку на фото 1
-                        "https://i.postimg.cc/59nJwfXM/2026-03-23-17-08-07.jpg"  // 👈 Вставь ссылку на фото 2
+                        "https://i.postimg.cc/hP1fr55y/2026-03-24-03-14-34.jpg", // 👈 Вставь ссылку на фото 1
+                        "https://i.postimg.cc/7YZyFtLT/2026-03-24-03-16-32.jpg",
+                        "https://i.postimg.cc/26NDgzqz/2026-03-24-03-15-30.jpg",
+                        "https://i.postimg.cc/SsLhhw8H/2026-03-24-03-15-01.jpg",
+                        "https://i.postimg.cc/rFV88Ffj/2026-03-24-03-15-18.jpg",
+                        "https://i.postimg.cc/8CM8RqyS/2026-03-24-03-16-13.jpg" // 👈 Вставь ссылку на фото 2
                     ],
                     // 👈 Ниже текст для шторки театра на английском
-                    text: "Theater is magic that comes alive on stage. Here, children and adults become creators, discovering new facets of talent and sincerity.<br><br>We create performances where every gesture and word is filled with meaning. Join our art!",
+                    text: "Theater studio 'Mariinka'<br><br>We create and perform amazing and magical shows!<br>25-time winners of international competitions in various categories!<br><br>For 20 years, we have been helping children become more self-confident, develop their artistry, and learn to work in a team.<br><br>In just 7 days, your child will prepare a performance in which they can express themselves and truly amaze their parents and the audience.<br><br>All this happens under the guidance of experienced teachers, in an inspiring and supportive environment using the immersion method.<br><br>Invite us, or come to us, and we will give you the brightest and most unforgettable memories! Let your child shine!",
                     btnText: "Dive into the world of theater" // Текст на золотой кнопке
                 },
                 training: {
                     photo: "https://i.postimg.cc/QtPb4P98/1.jpg", 
                     photo_2: "https://i.postimg.cc/K8F5Htz3/2.jpg",
-                    text: "Training in hosting mass, family, and children's holidays<br />for all occasions.<br /><br />'Keys. Materials. Scripts.' — is a ready-made system<br />for creating holidays.<br />Each script comes with a selection of games, music,<br />and checklists for props and costumes.<br /><br />You will get the structure of any holiday: from the beginning to the finale,<br />with the secrets of interactivity to keep the participants' attention.<br /><br />Come for ready-made tools<br />to host holidays with soul and ease! ✨",
-                    // 👇 ВСТАВЬ СВОЮ ССЫЛКУ НА КУРС В КАВЫЧКИ НИЖЕ 👇
-                    buttonLink: "https://vk.com/maris74"
+                    text: "Training in hosting mass, family, and children's holidays<br />for all occasions.<br /><br />'Keys. Materials. Scripts.' — is a ready-made system<br />for creating holidays.<br />Each script comes with a selection of games, music,<br />and checklists for props and costumes.<br /><br />You will get the structure of any holiday: from the beginning to the finale,<br />with the secrets of interactivity to keep the participants' attention.<br /><br />Come for ready-made tools<br />to host holidays with soul and ease! ✨"
                 },
                 services: [],
                 programs: [],
@@ -506,13 +538,14 @@
                     aboutBtnTitle: "Let's get acquainted", aboutBtnSub: "My story and journey",
                     reviewsTitle: "Reviews", writeReview: "Write a review",
                     fortuneBtnTitle: "Wish of the day", fortuneBtnSub: "Get a boost of inspiration",
-                    socialsTitle: "My social networks", servicesPageTitle: "My Services", programsPageTitle: "One-day programs",
+                    socialsTitle: "My social networks", servicesPageTitle: "Services", programsPageTitle: "One-day programs",
                     aboutSheetTitle: "About Me", trainingSheetTitle: "Training",
                     enrollBtn: "Sign up", fortuneSheetTitle: "Your wish for today",
                     reviewSheetTitle: "Leave a review", reviewNamePlaceholder: "Your name",
                     reviewTextPlaceholder: "Share your impressions...", reviewSubmitBtn: "Submit Review",
-                    moreBtn: "Details", toastSuccess: "Review sent successfully! 💖", toastWarning: "Please rate us with stars",
-                    successModalTitle: "Review submitted!", successModalDesc: "Thank you for your warm words. The review will appear on the page soon after verification.", successModalBtn: "Great"
+                    moreBtn: "Details", toastSuccess: "Review sent successfully! 💖", toastWarning: "Please leave a star rating",
+                    successModalTitle: "Review submitted!", successModalDesc: "Thank you for your warm words. The review will appear on the page soon after verification.", successModalBtn: "Great",
+                    socialVk: "VKontakte", socialTheater: "Theater", socialCamp: "Camp"
                 }
             }
         };
@@ -745,6 +778,23 @@
             <h2 id="posts-sheet-title" class="text-2xl font-bold mb-5 tracking-tight text-white text-center"></h2>
             <div id="posts-sheet-list" class="space-y-3">
                 <!-- Ссылки на посты -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- ШТОРКА НОВАЯ "ЛАГЕРЬ" (VIP-МЕНЮ) -->
+    <!-- ============================================== -->
+    <div id="camp-sheet" class="fixed md:absolute bottom-0 left-0 w-full bg-black/45 backdrop-blur-2xl border-t border-white/10 rounded-t-[2.5rem] z-50 transform sheet-hidden transition-transform duration-300 flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.4)]">
+        <div class="w-full flex justify-center py-4 drag-handle" onclick="closeSheet()">
+            <div class="w-14 h-1.5 bg-white/30 rounded-full"></div>
+        </div>
+        <button onclick="closeSheet()" class="absolute top-4 right-6 text-white/30 hover:text-white/80 p-2 z-10 active:scale-95 transition-all"><i class="ph-bold ph-x text-[20px]"></i></button>
+        <div class="overflow-y-auto px-6 pb-12 custom-scrollbar text-center">
+            <h2 id="ui-camp-sheet-title" class="text-2xl font-bold mb-3 tracking-tight text-white"></h2>
+            <p id="ui-camp-sheet-desc" class="text-[14px] text-gray-300 font-medium mb-6 leading-relaxed px-2"></p>
+            <div id="camp-options-list" class="space-y-3 text-left">
+                <!-- Опции генерируются через JS -->
             </div>
         </div>
     </div>
@@ -1037,6 +1087,7 @@
                 if (item.action === 'services') onClickAction = `openServicesPage()`;
                 if (item.action === 'programs') onClickAction = `openProgramsPage()`;
                 if (item.action === 'theater') onClickAction = `openTheaterSheet()`; // 👈 Подключил новую шторку театра
+                if (item.action === 'camp') onClickAction = `openCampSheet()`; // 👈 Подключил шторку лагеря
 
                 if (item.type === 'wide') {
                     const badgeHtml = item.badge 
@@ -1177,8 +1228,11 @@
 
             // Соцсети
             document.getElementById('social-vk').href = CONFIG.socials.vk;
+            document.getElementById('social-vk').textContent = CONFIG.ui.socialVk;
             document.getElementById('social-theater').href = CONFIG.socials.theater;
+            document.getElementById('social-theater').textContent = CONFIG.ui.socialTheater;
             document.getElementById('social-camp').href = CONFIG.socials.camp;
+            document.getElementById('social-camp').textContent = CONFIG.ui.socialCamp;
         }
 
         // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ЯЗЫКА ---
@@ -1538,6 +1592,42 @@
             }, 10);
         }
 
+        // 👇 НОВАЯ ФУНКЦИЯ ДЛЯ ОТКРЫТИЯ VIP-МЕНЮ "ЛАГЕРЬ" 👇
+        function openCampSheet() {
+            vkHaptic.impactOccurred('light');
+            lockScroll(); 
+
+            document.getElementById('ui-camp-sheet-title').textContent = CONFIG.camp.title;
+            document.getElementById('ui-camp-sheet-desc').textContent = CONFIG.camp.desc;
+
+            const list = document.getElementById('camp-options-list');
+            list.innerHTML = '';
+            CONFIG.camp.options.forEach(opt => {
+                list.innerHTML += `
+                    <a href="${opt.link}" target="_blank" rel="noopener noreferrer" onclick="vkHaptic.impactOccurred('medium')" class="block p-4 rounded-[2rem] card-shadow border border-white/10 hover:border-white/30 transition-all flex items-center gap-4 active:scale-[0.98]">
+                        <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl border border-white/20 shadow-sm shrink-0">
+                            ${opt.icon}
+                        </div>
+                        <div class="text-left flex-1">
+                            <span class="text-[16px] font-bold text-white block leading-tight">${opt.title}</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-white">
+                            <i class="ph-bold ph-arrow-right text-sm"></i>
+                        </div>
+                    </a>
+                `;
+            });
+
+            const sheet = document.getElementById('camp-sheet');
+            const overlay = document.getElementById('sheet-overlay');
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                sheet.classList.remove('sheet-hidden');
+            }, 10);
+        }
+
         // Открытие шторки с постами (теперь используется только для Лагеря)
         function openPostsSheet(index) {
             vkHaptic.impactOccurred('light');
@@ -1589,6 +1679,7 @@
             const postsSheet = document.getElementById('posts-sheet');
             const trainingSheet = document.getElementById('training-sheet');
             const theaterSheet = document.getElementById('theater-sheet'); // 👈 Добавил закрытие новой шторки
+            const campSheet = document.getElementById('camp-sheet'); // 👈 Закрытие шторки лагеря
             const serviceDetailsSheet = document.getElementById('service-details-sheet');
             const programDetailsSheet = document.getElementById('program-details-sheet');
             const fortuneSheet = document.getElementById('fortune-sheet');
@@ -1600,6 +1691,7 @@
             postsSheet.classList.add('sheet-hidden');
             trainingSheet.classList.add('sheet-hidden');
             theaterSheet.classList.add('sheet-hidden');
+            campSheet.classList.add('sheet-hidden');
             serviceDetailsSheet.classList.add('sheet-hidden');
             programDetailsSheet.classList.add('sheet-hidden');
             fortuneSheet.classList.add('sheet-hidden');
@@ -1710,35 +1802,11 @@
             if (GOOGLE_SHEET_ID) {
                 try {
                     // Скачиваем все вкладки одновременно для скорости
-                    const [fireRows, acroRows, campRows, servicesRows, reviewsRows] = await Promise.all([
-                        fetchGoogleSheet(TAB_FIRE),
-                        fetchGoogleSheet(TAB_ACRO),
+                    const [campRows, servicesRows, reviewsRows] = await Promise.all([
                         fetchGoogleSheet(TAB_CAMP),
                         fetchGoogleSheet(TAB_SERVICES),
                         fetchGoogleSheet(TAB_REVIEWS_PUB)
                     ]);
-
-                    // Обновляем Огненные выступления
-                    if (fireRows && fireRows.length > 0) {
-                        APP_DATA.ru.categories[0].posts = fireRows.map(row => ({
-                            title: row.c[0] ? String(row.c[0].v) : "", link: row.c[2] ? String(row.c[2].v) : "#"
-                        })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
-                        
-                        APP_DATA.en.categories[0].posts = fireRows.map(row => ({
-                            title: row.c[1] ? String(row.c[1].v) : (row.c[0] ? String(row.c[0].v) : ""), link: row.c[2] ? String(row.c[2].v) : "#"
-                        })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
-                    }
-
-                    // Обновляем Театр (загрузка данных для театра теперь игнорируется для рубрик, т.к. там карусель)
-                    if (acroRows && acroRows.length > 0) {
-                        APP_DATA.ru.categories[1].posts = acroRows.map(row => ({
-                            title: row.c[0] ? String(row.c[0].v) : "", link: row.c[2] ? String(row.c[2].v) : "#"
-                        })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
-                        
-                        APP_DATA.en.categories[1].posts = acroRows.map(row => ({
-                            title: row.c[1] ? String(row.c[1].v) : (row.c[0] ? String(row.c[0].v) : ""), link: row.c[2] ? String(row.c[2].v) : "#"
-                        })).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
-                    }
 
                     // Обновляем Лагерь (теперь это Однодневные программы, формат как у Услуг)
                     if (campRows && campRows.length > 0) {
@@ -1748,7 +1816,7 @@
                             return {
                                 title: row.c[0] ? String(row.c[0].v) : "", shortDesc: row.c[2] ? String(row.c[2].v) : "",
                                 fullDesc: row.c[4] ? String(row.c[4].v) : "", oldPrice: row.c[6] ? String(row.c[6].v) : "",
-                                newPrice: row.c[7] ? String(row.c[7].v) : "", buttonLink: row.c[8] ? String(row.c[8].v) : "#",
+                                newPrice: row.c[7] ? String(row.c[7].v) : "",
                                 photo: photosArr.length > 0 ? photosArr[0] : "", photos: photosArr
                             };
                         }).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
@@ -1761,8 +1829,7 @@
                                 shortDesc: row.c[3] ? String(row.c[3].v) : (row.c[2] ? String(row.c[2].v) : ""),
                                 fullDesc: row.c[5] ? String(row.c[5].v) : (row.c[4] ? String(row.c[4].v) : ""), 
                                 oldPrice: row.c[6] ? String(row.c[6].v) : "",
-                                newPrice: row.c[7] ? String(row.c[7].v) : "", 
-                                buttonLink: row.c[8] ? String(row.c[8].v) : "#",
+                                newPrice: row.c[7] ? String(row.c[7].v) : "",
                                 photo: photosArr.length > 0 ? photosArr[0] : "", photos: photosArr
                             };
                         }).filter(p => p.title && !p.title.toLowerCase().includes('название') && !p.title.toLowerCase().includes('title'));
@@ -1776,7 +1843,7 @@
                             return {
                                 title: row.c[0] ? String(row.c[0].v) : "", shortDesc: row.c[2] ? String(row.c[2].v) : "",
                                 fullDesc: row.c[4] ? String(row.c[4].v) : "", oldPrice: row.c[6] ? String(row.c[6].v) : "",
-                                newPrice: row.c[7] ? String(row.c[7].v) : "", buttonLink: row.c[8] ? String(row.c[8].v) : "#",
+                                newPrice: row.c[7] ? String(row.c[7].v) : "",
                                 photo: photosArr.length > 0 ? photosArr[0] : "", photos: photosArr
                             };
                         }).filter(s => s.title && !s.title.toLowerCase().includes('название') && !s.title.toLowerCase().includes('title'));
@@ -1789,8 +1856,7 @@
                                 shortDesc: row.c[3] ? String(row.c[3].v) : (row.c[2] ? String(row.c[2].v) : ""),
                                 fullDesc: row.c[5] ? String(row.c[5].v) : (row.c[4] ? String(row.c[4].v) : ""), 
                                 oldPrice: row.c[6] ? String(row.c[6].v) : "",
-                                newPrice: row.c[7] ? String(row.c[7].v) : "", 
-                                buttonLink: row.c[8] ? String(row.c[8].v) : "#",
+                                newPrice: row.c[7] ? String(row.c[7].v) : "",
                                 photo: photosArr.length > 0 ? photosArr[0] : "", photos: photosArr
                             };
                         }).filter(s => s.title && !s.title.toLowerCase().includes('название') && !s.title.toLowerCase().includes('title'));
