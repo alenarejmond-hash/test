@@ -17,7 +17,7 @@
     <!-- Иконки Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Предзагрузка главной фотографии для мгновенного отображения -->
-    <link rel="preload" as="image" href="https://i.postimg.cc/VLRqMjHB/2026-03-23-21-15-58.jpg">
+    <link rel="preload" as="image" href="https://i.postimg.cc/x8szLBzG/главная.jpg">
 
     <script>
         tailwind.config = {
@@ -142,7 +142,8 @@
         div[id$="-sheet"]:not(#sheet-overlay) {
             bottom: -150px !important; /* Уводим запасной фон под экран */
             padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            visibility: visible;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s 0s !important;
         }
 
         /* 3. Большие шторки (Обо мне, Обучение, Услуги) - 80% */
@@ -169,6 +170,8 @@
         /* Скрываем шторки за пределами экрана */
         .sheet-hidden {
             transform: translateY(100%) !important; /* Смещаем вниз на 100%. Запас в 150px надежно скроет все тени */
+            visibility: hidden;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s 0.3s !important;
         }
 
         /* 4. ЖЕЛЕЗОБЕТОННАЯ БЛОКИРОВКА СДВИГА ФОНА ПРИ СКРОЛЛЕ ШТОРКИ */
@@ -178,7 +181,7 @@
     </style>
 </head>
 <!-- Добавлено min-h-[100dvh] для идеального прилегания к экрану на мобильных (убирает щели снизу) -->
-<body class="dynamic-bg min-h-screen min-h-[100dvh] flex items-center justify-center p-0 md:p-6 overflow-x-hidden">
+<body class="dynamic-bg min-h-screen min-h-[100dvh] md:flex md:items-center md:justify-center p-0 md:p-6 overflow-x-hidden">
 
     <!-- ЗАГРУЗОЧНЫЙ ЭКРАН (Элегантный лоадер) -->
     <div id="app-loader" class="fixed inset-0 z-[100] dynamic-bg flex items-center justify-center transition-opacity duration-500">
@@ -234,8 +237,8 @@
             ru: {
                 profile: {
                     name: "Марина Жохова", 
-                    avatar: "https://i.postimg.cc/jqnYhnLL/Snimok-ekrana-2026-03-24-v-1-45-15-AM.jpg", 
-                    bio: "Создаю пространство, где каждый ребенок — герой, а каждый взрослый — творец ✨"
+                    avatar: "https://i.postimg.cc/x8szLBzG/главная.jpg", 
+                    bio: "Создаю пространство, где каждый человек творец ✨"
                 },
                 about: {
                     photo: "https://i.postimg.cc/MHRhdzFh/unnamed-1.jpg", 
@@ -248,7 +251,7 @@
                         "https://i.postimg.cc/x14MqkrG/2026-03-23-17-07-46.jpg",
                         "https://i.postimg.cc/fyKRdd63/2026-03-23-17-09-02.jpg"
                     ],
-                    text: "Я режиссёр и соавтор необычного детского лагеря «Чайка. Новая цивилизация», где дети учатся самостоятельности, дружбе, творчеству.<br><br>По образованию филолог и учитель, в семье мама четверых детей. Разрабатываю и провожу интерактивные программы по народному календарю, городские и семейные праздники, сказочные дни рождения, большое место в жизни занимает детский театр, театральные интенсивы и сказки. Также занимаюсь женскими кругами, круговыми танцами народов мира, практикую фольклорное врачевание песней.<br><br>Создам красивый спектакль и праздник для вас или вместе с вами." 
+                    text: "Я режиссёр и соавтор необычного детского лагеря «Чайка. Новая цивилизация», где дети учатся самостоятельности, дружбе, творчеству.<br><br>По образованию филолог и учитель, в семье мама четверых детей. Разрабатываю и провожу интерактивные программы по народному календарю, городские и семейные праздники, сказочные дни рождения. Большое место в жизни занимает детский театр, театральные интенсивы и сказки. Также занимаюсь женскими кругами, круговыми танцами народов мира, практикую фольклорное врачевание песней.<br><br>Создам красивый спектакль и праздник для вас или вместе с вами." 
                 },
                 categories: [
                     { 
@@ -282,17 +285,17 @@
                         { 
                             title: "Детский лагерь", 
                             icon: '<i class="ph-bold ph-rocket-launch text-[#d4af37]"></i>', 
-                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках для Детского лагеря (если нужно)
+                            link: "https://ochhorlag.ru/programs" // 👈 Измени ссылку в кавычках для Детского лагеря (если нужно)
                         },
                         { 
                             title: "Семейный лагерь", 
                             icon: '<i class="ph-bold ph-users-three text-[#d4af37]"></i>', 
-                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках для Семейного лагеря (если нужно)
+                            link: "https://ochhorlag.ru/programs" // 👈 Измени ссылку в кавычках для Семейного лагеря (если нужно)
                         },
                         { 
                             title: "Лагерь для взрослых", 
                             icon: '<i class="ph-bold ph-mountains text-[#d4af37]"></i>', 
-                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках для Взрослого лагеря (если нужно)
+                            link: "https://ochhorlag.ru/programs" // 👈 Измени ссылку в кавычках для Взрослого лагеря (если нужно)
                         }
                     ]
                 },
@@ -395,7 +398,7 @@
                 profile: {
                     name: "Marina Zhokhova", 
                     avatar: "https://i.postimg.cc/VLRqMjHB/2026_03_23_21_15_58.jpg", 
-                    bio: "Creating a space where every child is a hero, and every adult is a creator ✨"
+                    bio: "Creating a space where every person is a creator ✨"
                 },
                 about: {
                     photo: "https://i.postimg.cc/MHRhdzFh/unnamed-1.jpg", 
@@ -442,17 +445,17 @@
                         { 
                             title: "Children's Camp", 
                             icon: '<i class="ph-bold ph-rocket-launch text-[#d4af37]"></i>', 
-                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках
+                            link: "https://ochhorlag.ru/programs" // 👈 Измени ссылку в кавычках
                         },
                         { 
                             title: "Family Camp", 
                             icon: '<i class="ph-bold ph-users-three text-[#d4af37]"></i>', 
-                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках
+                            link: "https://ochhorlag.ru/programs" // 👈 Измени ссылку в кавычках
                         },
                         { 
                             title: "Adult Camp", 
                             icon: '<i class="ph-bold ph-mountains text-[#d4af37]"></i>', 
-                            link: GLOBAL_ACTION_LINK // 👈 Измени ссылку в кавычках
+                            link: "https://ochhorlag.ru/programs" // 👈 Измени ссылку в кавычках
                         }
                     ]
                 },
@@ -467,7 +470,7 @@
                         "https://i.postimg.cc/8CM8RqyS/2026-03-24-03-16-13.jpg" // 👈 Вставь ссылку на фото 2
                     ],
                     // 👈 Ниже текст для шторки театра на английском
-                    text: "Theater studio 'Mariinka'<br><br>We create and perform amazing and magical shows!<br>25-time winners of international competitions in various categories!<br><br>For 20 years, we have been helping children become more self-confident, develop their artistry, and learn to work in a team.<br><br>In just 7 days, your child will prepare a performance in which they can express themselves and truly amaze their parents and the audience.<br><br>All this happens under the guidance of experienced teachers, in an inspiring and supportive environment using the immersion method.<br><br>Invite us, or come to us, and we will give you the brightest and most unforgettable memories! Let your child shine!",
+                    text: "Theater studio 'Mariinka'<br></br>We create and perform amazing and magical shows!<br>25-time winners of international competitions in various categories!</br><br>For 20 years, we have been helping children become more self-confident, develop their artistry, and learn to work in a team.</br><br>In just 7 days, your child will prepare a performance in which they can express themselves and truly amaze their parents and the audience.<br></br>All this happens under the guidance of experienced teachers, in an inspiring and supportive environment using the immersion method.<br></br>Invite us, or come to us, and we will give you the brightest and most unforgettable memories! Let your child shine!",
                     btnText: "Dive into the world of theater" // Текст на золотой кнопке
                 },
                 training: {
@@ -590,7 +593,7 @@
         <!-- ГЛАВНОЕ ФОТО (С 3D-ЭФФЕКТОМ TILT) -->
         <div class="w-full fade-in">
             <div id="tilt-card" class="relative w-full aspect-[3.5/4] rounded-[2.5rem] overflow-hidden floating-shadow transform-gpu will-change-transform">
-                <img id="profile-avatar" src="https://i.postimg.cc/VLRqMjHB/2026-03-23-21-15-58.jpg" fetchpriority="high" alt="Avatar" class="absolute inset-0 w-full h-full object-cover z-0">
+                <img id="profile-avatar" src="https://i.postimg.cc/x8szLBzG/главная.jpg" fetchpriority="high" alt="Avatar" class="absolute inset-0 w-full h-full object-cover z-0">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
                 
                 <!-- Блик для 3D эффекта -->
