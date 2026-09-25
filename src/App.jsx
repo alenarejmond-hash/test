@@ -1,20 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   UserPlus, 
-  Mail, 
-  Briefcase, 
-  Camera,
-  Headphones, 
+  Camera, 
   Send,
-  Sun,
-  Moon,
-  Sparkles,
   MapPin,
   ShieldCheck,
-  Zap,
   Globe,
   ArrowUpRight,
-  Phone
+  Phone,
+  QrCode,
+  X
 } from 'lucide-react';
 
 const USER_DATA = {
@@ -69,47 +64,85 @@ const USER_DATA = {
 
 export default function DigitalCard() {
   const [isNightMode, setIsNightMode] = useState(false);
-  const [isManualOverride, setIsManualOverride] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isServerLoaded, setIsServerLoaded] = useState(false);
+  const [showQR, setShowQR] = useState(false); // Стейт для показа модального окна с QR
 
   // Ссылки для отслеживания быстрых тапов
   const tapCountRef = useRef(0);
   const lastTapTimeRef = useRef(0);
 
+  // Обращение к нашему серверу Vercel при загрузке
   useEffect(() => {
-    // Initial mount animation trigger
     requestAnimationFrame(() => setIsMounted(true));
 
-    const checkTime = () => {
-      if (isManualOverride) return;
-      const hour = new Date().getHours();
-      setIsNightMode(hour >= 20 || hour < 9); // Night mode from 20:00 to 09:00
+    const fetchServerStatus = async () => {
+      try {
+        // ЗАЩИТА: Если мы в песочнице (окно предпросмотра), не делаем fetch,
+        // чтобы не было красных ошибок Failed to parse URL
+        if (window.location.protocol === 'blob:' || window.location.origin === 'null') {
+          throw new Error("Sandbox mode");
+        }
+
+        const response = await fetch('/api/status');
+        const data = await response.json();
+        
+        if (data.mode) {
+          setIsNightMode(data.mode === 'night');
+        }
+      } catch (error) {
+        // Если сервер недоступен или мы в песочнице — молча включаем запасную логику
+        const now = new Date();
+        const hour = now.getHours();
+        const day = now.getDay(); // 0 - Вск, 6 - Суббота
+        
+        const isWeekend = day === 0 || day === 6;
+        const isNightTime = hour >= 18 || hour < 9;
+        
+        setIsNightMode(isWeekend || isNightTime);
+      } finally {
+        setIsServerLoaded(true);
+      }
     };
 
-    checkTime();
-    const interval = setInterval(checkTime, 60000);
+    fetchServerStatus();
+    // Проверяем статус каждые 30 секунд
+    const interval = setInterval(fetchServerStatus, 30000);
     return () => clearInterval(interval);
-  }, [isManualOverride]);
+  }, []);
 
-  const handleAvatarInteraction = () => {
+  const handleAvatarInteraction = async () => {
     const now = Date.now();
     const TIME_BETWEEN_TAPS = 800; // Максимум 800мс между тапами
 
     if (now - lastTapTimeRef.current > TIME_BETWEEN_TAPS) {
-      // Если прошло слишком много времени, сбрасываем счетчик
       tapCountRef.current = 1;
     } else {
-      // Иначе увеличиваем счетчик
       tapCountRef.current += 1;
     }
     
     lastTapTimeRef.current = now;
 
-    // Если набрали 5 тапов - переключаем
+    // Если набрали 5 тапов - переключаем и отправляем на сервер
     if (tapCountRef.current === 5) {
-      setIsManualOverride(true);
-      setIsNightMode(prev => !prev);
-      tapCountRef.current = 0; // Сбрасываем после успешного срабатывания
+      tapCountRef.current = 0; // Сбрасываем счетчик
+      
+      const newMode = isNightMode ? 'day' : 'night';
+      setIsNightMode(!isNightMode); // Мгновенно переключаем визуально
+
+      try {
+        if (window.location.protocol !== 'blob:' && window.location.origin !== 'null') {
+          await fetch('/api/status', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ mode: newMode })
+          });
+        }
+      } catch (error) {
+        // Молча игнорируем ошибку в песочнице
+      }
     }
   };
 
@@ -117,7 +150,7 @@ export default function DigitalCard() {
   const t = currentData.theme;
 
   return (
-    <div className="relative min-h-screen w-full bg-[#050505] font-sans text-zinc-100 flex items-center justify-center p-4 sm:p-6 overflow-hidden selection:bg-white/20">
+    <div className={`relative min-h-screen w-full bg-[#050505] font-sans text-zinc-100 flex items-center justify-center p-4 sm:p-6 overflow-hidden selection:bg-white/20 transition-opacity duration-700 ${isServerLoaded ? 'opacity-100' : 'opacity-0'}`}>
       
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Day Orbs */}
@@ -166,15 +199,26 @@ export default function DigitalCard() {
               </div>
             </div>
             
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-black/20 backdrop-blur-md transition-colors duration-700 border-white/5">
-              <div className={`w-1.5 h-1.5 rounded-full animate-pulse transition-colors duration-700 ${isNightMode ? 'bg-fuchsia-500 shadow-[0_0_8px_#d946ef]' : 'bg-emerald-500 shadow-[0_0_8px_#10b981]'}`} />
-              <div className="grid">
-                <span className={`col-start-1 row-start-1 text-[9px] font-bold tracking-wider transition-all duration-700 ${isNightMode ? 'opacity-0' : 'opacity-100 text-zinc-300'}`}>
-                  {USER_DATA.day.status}
-                </span>
-                <span className={`col-start-1 row-start-1 text-[9px] font-bold tracking-wider transition-all duration-700 ${isNightMode ? 'opacity-100 text-zinc-300' : 'opacity-0'}`}>
-                  {USER_DATA.night.status}
-                </span>
+            <div className="flex items-center gap-2">
+              {/* Кнопка вызова QR-кода */}
+              <button 
+                onClick={() => setShowQR(true)}
+                title="Показать QR-код"
+                className={`p-1.5 rounded-full border bg-black/20 backdrop-blur-md transition-colors duration-700 border-white/5 hover:bg-white/10 ${isNightMode ? 'text-fuchsia-400' : 'text-emerald-400'}`}
+              >
+                <QrCode size={14} />
+              </button>
+
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-black/20 backdrop-blur-md transition-colors duration-700 border-white/5">
+                <div className={`w-1.5 h-1.5 rounded-full animate-pulse transition-colors duration-700 ${isNightMode ? 'bg-fuchsia-500 shadow-[0_0_8px_#d946ef]' : 'bg-emerald-500 shadow-[0_0_8px_#10b981]'}`} />
+                <div className="grid">
+                  <span className={`col-start-1 row-start-1 text-[9px] font-bold tracking-wider transition-all duration-700 ${isNightMode ? 'opacity-0' : 'opacity-100 text-zinc-300'}`}>
+                    {USER_DATA.day.status}
+                  </span>
+                  <span className={`col-start-1 row-start-1 text-[9px] font-bold tracking-wider transition-all duration-700 ${isNightMode ? 'opacity-100 text-zinc-300' : 'opacity-0'}`}>
+                    {USER_DATA.night.status}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -182,7 +226,7 @@ export default function DigitalCard() {
           <div className="relative flex flex-col items-center mb-8">
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] rounded-full blur-xl transition-all duration-1000 ${isNightMode ? 'bg-fuchsia-600/30' : 'bg-emerald-500/10'}`} />
             
-            {/* АВАТАР - СЕКРЕТНАЯ КНОПКА (5 тапов) */}
+            {/* АВАТАР - СЕКРЕТНАЯ КНОПКА ДЛЯ ПЕРЕКЛЮЧЕНИЯ */}
             <div 
               onClick={handleAvatarInteraction}
               className={`
@@ -261,6 +305,49 @@ export default function DigitalCard() {
             </div>
           </div>
 
+        </div>
+      </div>
+
+      {/* Окно открывается поверх всей визитки */}
+      <div 
+        className={`fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all duration-500 ${showQR ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setShowQR(false)}
+      >
+        <div 
+          className={`relative w-full max-w-[320px] rounded-[2.5rem] p-8 border backdrop-blur-2xl transition-all duration-500 transform ${showQR ? 'scale-100 translate-y-0' : 'scale-95 translate-y-8'} ${isNightMode ? 'bg-fuchsia-950/40 border-fuchsia-500/20 shadow-[0_0_50px_-12px_rgba(217,70,239,0.3)]' : 'bg-emerald-950/40 border-emerald-500/20 shadow-[0_0_50px_-12px_rgba(16,185,129,0.3)]'}`} 
+          onClick={e => e.stopPropagation()}
+        >
+          <button 
+            onClick={() => setShowQR(false)} 
+            className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white transition-colors rounded-full hover:bg-white/10"
+          >
+            <X size={20} />
+          </button>
+          
+          <div className="flex flex-col items-center">
+            <div className={`p-3 rounded-2xl mb-4 bg-white/5 border ${isNightMode ? 'border-fuchsia-500/30' : 'border-emerald-500/30'}`}>
+              <QrCode size={32} className={isNightMode ? 'text-fuchsia-400' : 'text-emerald-400'} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Отсканируй меня</h3>
+            <p className="text-sm text-zinc-400 text-center mb-6">
+              Поделись контактом. Работает даже без интернета!
+            </p>
+            
+            <div className="bg-white p-3 rounded-3xl w-52 h-52 mx-auto flex items-center justify-center overflow-hidden relative shadow-inner">
+              <img 
+                src="./qr.png" 
+                alt="QR Code" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              <div className="hidden absolute inset-0 bg-zinc-100 flex-col items-center justify-center text-center p-2">
+                <span className="text-xs text-zinc-500 font-medium">Положите файл<br/><b>qr.png</b><br/>в папку public</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
