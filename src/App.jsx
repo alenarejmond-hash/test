@@ -66,35 +66,44 @@ export default function DigitalCard() {
   const [isNightMode, setIsNightMode] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isServerLoaded, setIsServerLoaded] = useState(false);
-  const [showQR, setShowQR] = useState(false); // Стейт для показа модального окна с QR
+  const [showQR, setShowQR] = useState(false);
 
   // Ссылки для отслеживания быстрых тапов
   const tapCountRef = useRef(0);
   const lastTapTimeRef = useRef(0);
 
-  // Обращение к нашему серверу Vercel при загрузке
   useEffect(() => {
     requestAnimationFrame(() => setIsMounted(true));
 
     const fetchServerStatus = async () => {
       try {
-        // ЗАЩИТА: Если мы в песочнице (окно предпросмотра), не делаем fetch,
-        // чтобы не было красных ошибок Failed to parse URL
         if (window.location.protocol === 'blob:' || window.location.origin === 'null') {
           throw new Error("Sandbox mode");
         }
 
-        const response = await fetch('/api/status');
+        // Убиваем кэш Vercel: добавляем уникальное время в конец запроса, 
+        // чтобы сервер думал, что это абсолютно новый запрос
+        const timestamp = new Date().getTime();
+        const response = await fetch(`/api/status?t=${timestamp}`, {
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        
+        if (!response.ok) throw new Error("Network response was not ok");
+        
         const data = await response.json();
         
         if (data.mode) {
           setIsNightMode(data.mode === 'night');
         }
       } catch (error) {
-        // Если сервер недоступен или мы в песочнице — молча включаем запасную логику
+        // Фоллбэк (если сервер недоступен)
         const now = new Date();
         const hour = now.getHours();
-        const day = now.getDay(); // 0 - Вск, 6 - Суббота
+        const day = now.getDay(); 
         
         const isWeekend = day === 0 || day === 6;
         const isNightTime = hour >= 18 || hour < 9;
@@ -106,8 +115,8 @@ export default function DigitalCard() {
     };
 
     fetchServerStatus();
-    // Проверяем статус каждые 30 секунд
-    const interval = setInterval(fetchServerStatus, 30000);
+    // Проверяем статус каждые 15 секунд для большей скорости реакции
+    const interval = setInterval(fetchServerStatus, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -123,9 +132,9 @@ export default function DigitalCard() {
     
     lastTapTimeRef.current = now;
 
-    // Если набрали 5 тапов - переключаем и отправляем на сервер
+    // Если набрали 5 тапов
     if (tapCountRef.current === 5) {
-      tapCountRef.current = 0; // Сбрасываем счетчик
+      tapCountRef.current = 0; 
       
       const newMode = isNightMode ? 'day' : 'night';
       setIsNightMode(!isNightMode); // Мгновенно переключаем визуально
@@ -141,7 +150,7 @@ export default function DigitalCard() {
           });
         }
       } catch (error) {
-        // Молча игнорируем ошибку в песочнице
+        console.error("Fetch failed", error);
       }
     }
   };
@@ -226,7 +235,6 @@ export default function DigitalCard() {
           <div className="relative flex flex-col items-center mb-8">
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] rounded-full blur-xl transition-all duration-1000 ${isNightMode ? 'bg-fuchsia-600/30' : 'bg-emerald-500/10'}`} />
             
-            {/* АВАТАР - СЕКРЕТНАЯ КНОПКА ДЛЯ ПЕРЕКЛЮЧЕНИЯ */}
             <div 
               onClick={handleAvatarInteraction}
               className={`
@@ -288,14 +296,12 @@ export default function DigitalCard() {
           <div className="relative min-h-[220px]">
             <div className="grid">
               
-              {/* Day Actions */}
               <div className={`col-start-1 row-start-1 w-full grid grid-cols-2 gap-3 transition-all duration-700 ease-in-out ${isNightMode ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
                 {USER_DATA.day.actions.map((action) => (
                   <ActionBtn key={action.id} action={action} theme={USER_DATA.day.theme} />
                 ))}
               </div>
 
-              {/* Night Actions */}
               <div className={`col-start-1 row-start-1 w-full grid grid-cols-2 gap-3 transition-all duration-700 ease-in-out delay-75 ${isNightMode ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'}`}>
                 {USER_DATA.night.actions.map((action) => (
                   <ActionBtn key={action.id} action={action} theme={USER_DATA.night.theme} />
@@ -308,7 +314,6 @@ export default function DigitalCard() {
         </div>
       </div>
 
-      {/* Окно открывается поверх всей визитки */}
       <div 
         className={`fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all duration-500 ${showQR ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setShowQR(false)}
