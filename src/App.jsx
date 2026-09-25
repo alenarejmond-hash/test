@@ -67,22 +67,26 @@ export default function DigitalCard() {
   const [isMounted, setIsMounted] = useState(false);
   const [isServerLoaded, setIsServerLoaded] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  
+  // Флаг диагностики: если false - загорится красная лампочка
+  const [dbStatus, setDbStatus] = useState(true);
 
   // Ссылки для отслеживания быстрых тапов
   const tapCountRef = useRef(0);
   const lastTapTimeRef = useRef(0);
+  const localOverrideRef = useRef(false);
 
   useEffect(() => {
     requestAnimationFrame(() => setIsMounted(true));
 
     const fetchServerStatus = async () => {
       try {
+        // Защита от локальной песочницы: если открыто не на нормальном сервере
         if (window.location.protocol === 'blob:' || window.location.origin === 'null') {
           throw new Error("Sandbox mode");
         }
 
-        // Убиваем кэш Vercel: добавляем уникальное время в конец запроса
-        const timestamp = new Date().getTime();
+        const timestamp = new Date().getTime(); // Убиваем кэш Vercel
         const response = await fetch(`/api/status?t=${timestamp}`, {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -95,26 +99,35 @@ export default function DigitalCard() {
         
         const data = await response.json();
         
-        if (data.mode) {
+        // Показываем красную лампочку, если сервер жалуется на ключи базы
+        if (data.dbConnected === false) {
+          setDbStatus(false);
+        } else {
+          setDbStatus(true);
+        }
+        
+        // Если мы не перехватывали управление вручную в эту сессию, слушаем сервер
+        if (!localOverrideRef.current && data.mode) {
           setIsNightMode(data.mode === 'night');
         }
+
       } catch (error) {
-        // Фоллбэк (если сервер недоступен)
-        const now = new Date();
-        const hour = now.getHours();
-        const day = now.getDay(); 
-        
-        const isWeekend = day === 0 || day === 6;
-        const isNightTime = hour >= 18 || hour < 9;
-        
-        setIsNightMode(isWeekend || isNightTime);
+        // Фоллбэк (если сервер недоступен или это песочница)
+        if (!localOverrideRef.current) {
+          const now = new Date();
+          const hour = now.getHours();
+          const day = now.getDay(); 
+          const isWeekend = day === 0 || day === 6;
+          const isNightTime = hour >= 18 || hour < 9;
+          setIsNightMode(isWeekend || isNightTime);
+        }
       } finally {
         setIsServerLoaded(true);
       }
     };
 
     fetchServerStatus();
-    // Проверяем статус каждые 15 секунд
+    // Проверяем статус каждые 15 секунд (полезно, если ты включишь режим, а другой телефон открыт)
     const interval = setInterval(fetchServerStatus, 15000);
     return () => clearInterval(interval);
   }, []);
@@ -134,28 +147,33 @@ export default function DigitalCard() {
     // Если набрали 5 тапов
     if (tapCountRef.current === 5) {
       tapCountRef.current = 0; 
+      localOverrideRef.current = true; // Блокируем авто-обновление для этого устройства
       
       const newMode = isNightMode ? 'day' : 'night';
       setIsNightMode(!isNightMode); // Мгновенно переключаем визуально
 
       try {
         if (window.location.protocol !== 'blob:' && window.location.origin !== 'null') {
-          const res = await fetch('/api/status', {
+          const timestamp = new Date().getTime(); // Убиваем кэш Vercel для POST-запроса
+          const res = await fetch(`/api/status?t=${timestamp}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
             },
             body: JSON.stringify({ mode: newMode })
           });
           
-          if (res.ok) {
-            console.log("Успешно записано в базу данных Vercel KV!");
+          const data = await res.json();
+          if (!data.dbSuccess) {
+            setDbStatus(false); // Зажигаем красную лампочку, если запись в базу не удалась
           } else {
-            console.error("Сервер ответил ошибкой при записи");
+            setDbStatus(true);
           }
         }
       } catch (error) {
         console.error("Fetch failed", error);
+        setDbStatus(false);
       }
     }
   };
@@ -166,17 +184,15 @@ export default function DigitalCard() {
   return (
     <div className={`relative min-h-screen w-full bg-[#050505] font-sans text-zinc-100 flex items-center justify-center p-4 sm:p-6 overflow-hidden selection:bg-white/20 transition-opacity duration-700 ${isServerLoaded ? 'opacity-100' : 'opacity-0'}`}>
       
+      {/* Фоновые орбиты */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Day Orbs */}
         <div className={`absolute -top-[20%] -right-[10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] transition-all duration-1000 ease-in-out ${isNightMode ? 'opacity-0 scale-75' : 'opacity-100 scale-100'} ${USER_DATA.day.theme.orb1}`} />
         <div className={`absolute -bottom-[20%] -left-[10%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full blur-[100px] transition-all duration-1000 ease-in-out ${isNightMode ? 'opacity-0 scale-75' : 'opacity-100 scale-100'} ${USER_DATA.day.theme.orb2}`} />
         
-        {/* Night Orbs */}
         <div className={`absolute -top-[10%] -left-[10%] w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] transition-all duration-1000 ease-in-out ${isNightMode ? 'opacity-100 scale-100' : 'opacity-0 scale-125'} ${USER_DATA.night.theme.orb1}`} />
         <div className={`absolute top-[40%] -right-[20%] w-[70vw] h-[70vw] max-w-[500px] max-h-[500px] rounded-full blur-[120px] transition-all duration-1000 ease-in-out delay-100 ${isNightMode ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} ${USER_DATA.night.theme.orb2}`} />
       </div>
 
-      {/* Noise Overlay */}
       <div 
         className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none z-0" 
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
@@ -200,6 +216,7 @@ export default function DigitalCard() {
 
         <div className="p-6 sm:p-8">
           
+          {/* Header & Badges */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-2">
               <ShieldCheck size={14} className={isNightMode ? 'text-fuchsia-400' : 'text-emerald-400'} />
@@ -214,6 +231,7 @@ export default function DigitalCard() {
             </div>
             
             <div className="flex items-center gap-2">
+              {/* Кнопка вызова QR-кода */}
               <button 
                 onClick={() => setShowQR(true)}
                 title="Показать QR-код"
@@ -223,7 +241,8 @@ export default function DigitalCard() {
               </button>
 
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-black/20 backdrop-blur-md transition-colors duration-700 border-white/5">
-                <div className={`w-1.5 h-1.5 rounded-full animate-pulse transition-colors duration-700 ${isNightMode ? 'bg-fuchsia-500 shadow-[0_0_8px_#d946ef]' : 'bg-emerald-500 shadow-[0_0_8px_#10b981]'}`} />
+                {/* ДИАГНОСТИЧЕСКАЯ ЛАМПОЧКА (Красная = ошибка базы, Зеленая/Розовая = норм) */}
+                <div className={`w-1.5 h-1.5 rounded-full animate-pulse transition-colors duration-700 ${!dbStatus ? 'bg-red-500 shadow-[0_0_8px_#ef4444]' : (isNightMode ? 'bg-fuchsia-500 shadow-[0_0_8px_#d946ef]' : 'bg-emerald-500 shadow-[0_0_8px_#10b981]')}`} />
                 <div className="grid">
                   <span className={`col-start-1 row-start-1 text-[9px] font-bold tracking-wider transition-all duration-700 ${isNightMode ? 'opacity-0' : 'opacity-100 text-zinc-300'}`}>
                     {USER_DATA.day.status}
@@ -236,6 +255,7 @@ export default function DigitalCard() {
             </div>
           </div>
 
+          {/* Avatar and Info */}
           <div className="relative flex flex-col items-center mb-8">
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] rounded-full blur-xl transition-all duration-1000 ${isNightMode ? 'bg-fuchsia-600/30' : 'bg-emerald-500/10'}`} />
             
@@ -248,12 +268,12 @@ export default function DigitalCard() {
             `}>
               <div className="w-full h-full rounded-full overflow-hidden relative bg-[#0a0a0a] ring-2 ring-black">
                 <img 
-                  src={USER_DATA.day.avatar} 
+                  src="./business-avatar.jpeg" 
                   alt="Business Profile"
                   className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${isNightMode ? 'opacity-0 scale-110 filter blur-sm' : 'opacity-100 scale-100 filter blur-0'}`}
                 />
                 <img 
-                  src={USER_DATA.night.avatar} 
+                  src="./personal-avatar.jpeg" 
                   alt="Personal Profile"
                   className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${isNightMode ? 'opacity-100 scale-100 filter blur-0' : 'opacity-0 scale-110 filter blur-sm'}`}
                 />
@@ -297,9 +317,9 @@ export default function DigitalCard() {
             </div>
           </div>
 
+          {/* Action Buttons */}
           <div className="relative min-h-[220px]">
             <div className="grid">
-              
               <div className={`col-start-1 row-start-1 w-full grid grid-cols-2 gap-3 transition-all duration-700 ease-in-out ${isNightMode ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
                 {USER_DATA.day.actions.map((action) => (
                   <ActionBtn key={action.id} action={action} theme={USER_DATA.day.theme} />
@@ -311,13 +331,13 @@ export default function DigitalCard() {
                   <ActionBtn key={action.id} action={action} theme={USER_DATA.night.theme} />
                 ))}
               </div>
-
             </div>
           </div>
 
         </div>
       </div>
 
+      {/* QR Code Modal (Рабочий оффлайн) */}
       <div 
         className={`fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all duration-500 ${showQR ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setShowQR(false)}
