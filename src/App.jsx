@@ -81,8 +81,7 @@ export default function DigitalCard() {
           throw new Error("Sandbox mode");
         }
 
-        // Убиваем кэш Vercel: добавляем уникальное время в конец запроса, 
-        // чтобы сервер думал, что это абсолютно новый запрос
+        // Убиваем кэш Vercel: добавляем уникальное время в конец запроса
         const timestamp = new Date().getTime();
         const response = await fetch(`/api/status?t=${timestamp}`, {
           headers: {
@@ -115,14 +114,14 @@ export default function DigitalCard() {
     };
 
     fetchServerStatus();
-    // Проверяем статус каждые 15 секунд для большей скорости реакции
+    // Проверяем статус каждые 15 секунд
     const interval = setInterval(fetchServerStatus, 15000);
     return () => clearInterval(interval);
   }, []);
 
   const handleAvatarInteraction = async () => {
     const now = Date.now();
-    const TIME_BETWEEN_TAPS = 800; // Максимум 800мс между тапами
+    const TIME_BETWEEN_TAPS = 800;
 
     if (now - lastTapTimeRef.current > TIME_BETWEEN_TAPS) {
       tapCountRef.current = 1;
@@ -141,13 +140,19 @@ export default function DigitalCard() {
 
       try {
         if (window.location.protocol !== 'blob:' && window.location.origin !== 'null') {
-          await fetch('/api/status', {
+          const res = await fetch('/api/status', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ mode: newMode })
           });
+          
+          if (res.ok) {
+            console.log("Успешно записано в базу данных Vercel KV!");
+          } else {
+            console.error("Сервер ответил ошибкой при записи");
+          }
         }
       } catch (error) {
         console.error("Fetch failed", error);
@@ -209,7 +214,6 @@ export default function DigitalCard() {
             </div>
             
             <div className="flex items-center gap-2">
-              {/* Кнопка вызова QR-кода */}
               <button 
                 onClick={() => setShowQR(true)}
                 title="Показать QR-код"
