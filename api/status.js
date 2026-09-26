@@ -1,5 +1,10 @@
+// Глобальные переменные для временного хранения в оперативной памяти Vercel (Lambda RAM)
+// Это запасной план: даже если вы не подключили базу данных (KV), сервер запомнит выбор в оперативной памяти!
+let memoryMode = null;
+let memoryExpiry = 0;
+
 export default async function handler(request, response) {
-  // Отключаем кэширование намертво, чтобы сервер всегда думал головой, а не брал из памяти
+  // Отключаем кэширование намертво, чтобы сервер всегда думал головой, а не брал из памяти браузера
   response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   response.setHeader('Pragma', 'no-cache');
   response.setHeader('Expires', '0');
@@ -10,7 +15,6 @@ export default async function handler(request, response) {
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control, Pragma, Expires');
 
   // КРИТИЧЕСКИ ВАЖНО: Обработка предварительного запроса (CORS OPTIONS). 
-  // Без этого браузер заблокирует POST-запрос с кастомными заголовками и статус не сохранится!
   if (request.method === 'OPTIONS') {
     return response.status(200).end();
   }
@@ -55,7 +59,7 @@ export default async function handler(request, response) {
     }
   }
 
-  // 1. ЗАПИСЬ ТАПОВ В БАЗУ ДАННЫХ
+  // 1. ЗАПИСЬ ТАПОВ В БАЗУ ДАННЫХ ИЛИ ОПЕРАТИВНУЮ ПАМЯТЬ
   if (request.method === 'POST') {
     let mode = null;
     
@@ -71,11 +75,19 @@ export default async function handler(request, response) {
     }
     
     let dbSuccess = false;
-    if (mode && kvUrl && kvToken) {
-      // Отправляем команду SET на 2 часа (7200 секунд)
-      const result = await executeRedisCommand(["SET", "elena_override_mode", mode, "EX", 7200]);
-      if (result === "OK" || result === "OK") { // Vercel KV возвращает строку OK
-        dbSuccess = true;
+    
+    if (mode) {
+      // ХИТРОСТЬ: Сохраняем в оперативную память сервера на 2 часа!
+      // Теперь визитка переключится, даже если вы не настроили базу данных на Vercel.
+      memoryMode = mode;
+      memoryExpiry = Date.now() + (2 * 60 * 60 * 1000); 
+
+      // Пытаемся сохранить в настоящую базу (если она есть)
+      if (kvUrl && kvToken) {
+        const result = await executeRedisCommand(["SET", "elena_override_mode", mode, "EX", 7200]);
+        if (result === "OK" || result === "OK") { 
+          dbSuccess = true;
+        }
       }
     }
     
@@ -84,30 +96,36 @@ export default async function handler(request, response) {
       success: true, 
       mode: mode, 
       dbSuccess: dbSuccess,
-      dbConnected: !!(kvUrl && kvToken)
+      dbConnected: !!(kvUrl && kvToken),
+      memoryFallback: !dbSuccess // Даем знать React-приложению, что мы используем оперативную память
     });
   }
 
-  // 2. ЧТЕНИЕ СТАТУСА ПРИ ОТКРЫТИИ ВИЗИТКИ
+  // 2. ЧТЕНИЕ СТАТУСА ПРИ ОТКРЫТИИ ВИЗИТКИ (СКАНИРОВАНИЕ QR)
   if (request.method === 'GET') {
     let override = null;
     
-    // Сначала проверяем базу данных (ручной перехват)
+    // Сначала проверяем настоящую базу данных (ручной перехват)
     if (kvUrl && kvToken) {
       override = await executeRedisCommand(["GET", "elena_override_mode"]);
     }
 
-    // Защита: иногда Upstash возвращает строку вместе с кавычками (например '"day"'), очищаем их
+    // Защита: иногда Upstash возвращает строку вместе с кавычками, очищаем их
     if (typeof override === 'string') {
       override = override.replace(/["']/g, '').trim();
     }
 
-    // Если есть ручной перехват, отдаем его немедленно
+    // ХИТРОСТЬ: Если база данных пуста или не подключена, проверяем оперативную память!
+    if (!override && memoryMode && Date.now() < memoryExpiry) {
+      override = memoryMode;
+    }
+
+    // Если есть ручной перехват (из БД или из Памяти), отдаем его немедленно
     if (override === 'day' || override === 'night') {
       return response.status(200).json({ 
         mode: override, 
-        source: 'manual', 
-        dbConnected: true 
+        source: 'manual_or_memory', 
+        dbConnected: !!(kvUrl && kvToken) 
       });
     }
 
