@@ -102,11 +102,34 @@ export default function DigitalCard() {
         }
         
         if (!localOverrideRef.current && data.mode) {
-          setIsNightMode(data.mode === 'night');
+          // ЖЕЛЕЗОБЕТОННАЯ БЛОКИРОВКА ВИЗИТКИ ГОСТЯ
+          try {
+            const savedMode = localStorage.getItem('strict_visitor_mode');
+            if (!savedMode) {
+              // Зашел впервые: запоминаем навсегда то, что отдал сервер
+              localStorage.setItem('strict_visitor_mode', data.mode);
+              setIsNightMode(data.mode === 'night');
+            } else {
+              // УЖЕ БЫЛ: Показываем строго то, что заблокировали в первый раз!
+              setIsNightMode(savedMode === 'night');
+            }
+          } catch (e) {
+            // Защита если режим инкогнито блокирует память
+            setIsNightMode(data.mode === 'night');
+          }
         }
 
       } catch (error) {
         if (!localOverrideRef.current) {
+          try {
+            const savedMode = localStorage.getItem('strict_visitor_mode');
+            if (savedMode) {
+              setIsNightMode(savedMode === 'night');
+              setIsServerLoaded(true);
+              return;
+            }
+          } catch (e) {}
+
           const now = new Date();
           const hour = now.getHours();
           const day = now.getDay(); 
@@ -143,6 +166,11 @@ export default function DigitalCard() {
       setIsNightMode(prev => {
         const newMode = prev ? 'day' : 'night';
         
+        // ВНИМАНИЕ: Мы намеренно убрали перезапись localStorage здесь!
+        // 5 тапов дают команду серверу (Vercel) переключить визитку для новых гостей.
+        // Но при обновлении страницы, ЭТОТ браузер строго вернется к первоначально
+        // сохраненной визитке, обеспечивая ту самую железобетонную блокировку.
+        
         if (window.location.protocol !== 'blob:' && window.location.origin !== 'null') {
           const timestamp = new Date().getTime();
           fetch(`/api/status?t=${timestamp}`, {
@@ -172,7 +200,7 @@ export default function DigitalCard() {
   return (
     <div className={`relative min-h-screen w-full bg-[#050505] font-sans text-zinc-100 flex items-center justify-center p-4 sm:p-6 overflow-hidden selection:bg-white/20 transition-opacity duration-700 ${isServerLoaded ? 'opacity-100' : 'opacity-0'}`}>
       
-      {}
+      {/* Background Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className={`absolute -top-[20%] -right-[10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] transition-all duration-1000 ease-in-out ${isNightMode ? 'opacity-0 scale-75' : 'opacity-100 scale-100'} ${USER_DATA.day.theme.orb1}`} />
         <div className={`absolute -bottom-[20%] -left-[10%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full blur-[100px] transition-all duration-1000 ease-in-out ${isNightMode ? 'opacity-0 scale-75' : 'opacity-100 scale-100'} ${USER_DATA.day.theme.orb2}`} />
@@ -181,13 +209,13 @@ export default function DigitalCard() {
         <div className={`absolute top-[40%] -right-[20%] w-[70vw] h-[70vw] max-w-[500px] max-h-[500px] rounded-full blur-[120px] transition-all duration-1000 ease-in-out delay-100 ${isNightMode ? 'opacity-100 scale-100' : 'opacity-0 scale-75'} ${USER_DATA.night.theme.orb2}`} />
       </div>
 
-      {}
+      {/* Noise overlay */}
       <div 
         className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none z-0" 
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
       />
 
-      {}
+      {/* Main Card */}
       <div 
         className={`
           relative z-10 w-full max-w-md mx-auto 
@@ -206,7 +234,7 @@ export default function DigitalCard() {
 
         <div className="p-6 sm:p-8">
           
-          {}
+          {/* Header section with badges */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-2">
               <ShieldCheck size={14} className={isNightMode ? 'text-fuchsia-400' : 'text-emerald-400'} />
@@ -220,7 +248,7 @@ export default function DigitalCard() {
               </div>
             </div>
             
-            {}
+            {/* Status indicators */}
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setShowQR(true)}
@@ -244,7 +272,6 @@ export default function DigitalCard() {
             </div>
           </div>
 
-          {}
           <div className="relative flex flex-col items-center mb-8">
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] rounded-full blur-xl transition-all duration-1000 ${isNightMode ? 'bg-fuchsia-600/30' : 'bg-emerald-500/10'}`} />
             
@@ -269,7 +296,7 @@ export default function DigitalCard() {
               </div>
             </div>
 
-            {}
+            {/* Profile Info */}
             <div className="grid place-items-center w-full mb-2">
               <h1 className={`col-start-1 row-start-1 text-2xl sm:text-3xl font-bold tracking-tight text-white transition-all duration-700 ease-in-out ${isNightMode ? 'opacity-0 translate-y-2 blur-sm' : 'opacity-100 translate-y-0 blur-0'}`}>
                 {USER_DATA.day.name}
@@ -296,7 +323,7 @@ export default function DigitalCard() {
               </p>
             </div>
 
-            {}
+            {/* Location */}
             <div className="flex items-center gap-4 mt-6 px-4 py-2 rounded-xl bg-white/[0.02] border border-white/5">
               <div className="flex items-center gap-1.5 text-zinc-400">
                 <MapPin size={12} />
@@ -308,7 +335,6 @@ export default function DigitalCard() {
             </div>
           </div>
 
-          {}
           <div className="relative min-h-[220px]">
             <div className="grid">
               <div className={`col-start-1 row-start-1 w-full grid grid-cols-2 gap-3 transition-all duration-700 ease-in-out ${isNightMode ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
@@ -328,7 +354,6 @@ export default function DigitalCard() {
         </div>
       </div>
 
-      {}
       <div 
         className={`fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all duration-500 ${showQR ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setShowQR(false)}
