@@ -4,8 +4,28 @@ export default async function handler(request, response) {
   response.setHeader('Expires', '0');
   response.setHeader('Access-Control-Allow-Origin', '*');
 
-  const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  let kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  let kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  // Если стандартные имена не подошли, запускаем умную ищейку
+  if (!kvUrl || !kvToken) {
+    const envKeys = Object.keys(process.env);
+    // Ищем любую переменную, которая заканчивается на _URL и ведет на сервера базы данных
+    const foundUrlKey = envKeys.find(key => 
+      key.endsWith('_URL') && 
+      process.env[key] && 
+      typeof process.env[key] === 'string' &&
+      (process.env[key].includes('upstash.io') || process.env[key].includes('vercel-storage.com'))
+    );
+    
+    // Если нашли ссылку, автоматически вычисляем имя ключа для пароля
+    if (foundUrlKey) {
+      kvUrl = process.env[foundUrlKey];
+      const possibleTokenKey1 = foundUrlKey.replace('_URL', '_TOKEN');
+      const possibleTokenKey2 = foundUrlKey.replace('REST_API_URL', 'REST_API_TOKEN');
+      kvToken = process.env[possibleTokenKey1] || process.env[possibleTokenKey2];
+    }
+  }
 
   async function executeRedisCommand(commandArray) {
     if (!kvUrl || !kvToken) return null;
@@ -18,10 +38,10 @@ export default async function handler(request, response) {
         },
         body: JSON.stringify(commandArray)
       });
+      if (!res.ok) return null;
       const data = await res.json();
       return data.result;
     } catch (e) {
-      console.error("Redis Error:", e);
       return null;
     }
   }
@@ -34,7 +54,7 @@ export default async function handler(request, response) {
     
     let dbSuccess = false;
     if (mode && kvUrl && kvToken) {
-      // Отправляем команду SET на 2 часа (7200 секунд) в самом надежном формате
+      // Отправляем команду SET на 2 часа (7200 секунд)
       const result = await executeRedisCommand(["SET", "elena_override_mode", mode, "EX", 7200]);
       if (result === "OK") {
         dbSuccess = true;
@@ -74,10 +94,13 @@ export default async function handler(request, response) {
     let mode = 'night';
     let source = 'time';
 
+    // В субботу и воскресенье всегда личная
     if (weekday === 'Sat' || weekday === 'Sun') {
       mode = 'night';
       source = 'weekend';
-    } else if (hour >= 9 && hour < 18) {
+    } 
+    // В будни с 9 до 18 рабочая
+    else if (hour >= 9 && hour < 18) {
       mode = 'day';
       source = 'time';
     }
