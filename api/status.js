@@ -3,10 +3,19 @@ export default async function handler(request, response) {
   response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   response.setHeader('Pragma', 'no-cache');
   response.setHeader('Expires', '0');
+  
+  // CORS заголовки для безопасной работы с React
   response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control, Pragma, Expires');
+
+  // КРИТИЧЕСКИ ВАЖНО: Обработка предварительного запроса (CORS OPTIONS). 
+  // Без этого браузер заблокирует POST-запрос с кастомными заголовками и статус не сохранится!
+  if (request.method === 'OPTIONS') {
+    return response.status(200).end();
+  }
 
   // Умный поиск ключей доступа к базе данных Vercel (Upstash)
-  // Проверяем все возможные префиксы, которые мог сгенерировать Vercel
   let kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || process.env.STORAGE_REST_API_URL;
   let kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.STORAGE_REST_API_TOKEN;
 
@@ -48,19 +57,28 @@ export default async function handler(request, response) {
 
   // 1. ЗАПИСЬ ТАПОВ В БАЗУ ДАННЫХ
   if (request.method === 'POST') {
-    let mode = request.body?.mode;
-    if (!mode && typeof request.body === 'string') {
-      try { mode = JSON.parse(request.body).mode; } catch (e) {}
+    let mode = null;
+    
+    // Безопасное чтение тела запроса для любых сред (Vercel, Node, Edge)
+    if (request.body) {
+      if (typeof request.body === 'object') {
+        mode = request.body.mode;
+      } else if (typeof request.body === 'string') {
+        try { mode = JSON.parse(request.body).mode; } catch (e) {}
+      } else {
+        try { mode = JSON.parse(request.body.toString()).mode; } catch (e) {}
+      }
     }
     
     let dbSuccess = false;
     if (mode && kvUrl && kvToken) {
       // Отправляем команду SET на 2 часа (7200 секунд)
       const result = await executeRedisCommand(["SET", "elena_override_mode", mode, "EX", 7200]);
-      if (result === "OK") {
+      if (result === "OK" || result === "OK") { // Vercel KV возвращает строку OK
         dbSuccess = true;
       }
     }
+    
     // Возвращаем статус успеха
     return response.status(200).json({ 
       success: true, 
@@ -77,6 +95,11 @@ export default async function handler(request, response) {
     // Сначала проверяем базу данных (ручной перехват)
     if (kvUrl && kvToken) {
       override = await executeRedisCommand(["GET", "elena_override_mode"]);
+    }
+
+    // Защита: иногда Upstash возвращает строку вместе с кавычками (например '"day"'), очищаем их
+    if (typeof override === 'string') {
+      override = override.replace(/["']/g, '').trim();
     }
 
     // Если есть ручной перехват, отдаем его немедленно
@@ -128,6 +151,6 @@ export default async function handler(request, response) {
     });
   }
 
-  // Защита от неверных запросов
+  // Защита от неверных запросов (PUT, DELETE и т.д.)
   return response.status(405).json({ error: 'Method not allowed' });
 }
