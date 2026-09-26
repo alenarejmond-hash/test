@@ -1,32 +1,32 @@
 export default async function handler(request, response) {
+  // Отключаем кэширование намертво, чтобы сервер всегда думал головой, а не брал из памяти
   response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   response.setHeader('Pragma', 'no-cache');
   response.setHeader('Expires', '0');
   response.setHeader('Access-Control-Allow-Origin', '*');
 
-  let kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  let kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  // Умный поиск ключей доступа к базе данных Vercel (Upstash)
+  // Проверяем все возможные префиксы, которые мог сгенерировать Vercel
+  let kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || process.env.STORAGE_REST_API_URL;
+  let kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.STORAGE_REST_API_TOKEN;
 
-  // Если стандартные имена не подошли, запускаем умную ищейку
+  // Если стандартные имена не подошли, ищем любую переменную с REST_API_URL
   if (!kvUrl || !kvToken) {
     const envKeys = Object.keys(process.env);
-    // Ищем любую переменную, которая заканчивается на _URL и ведет на сервера базы данных
     const foundUrlKey = envKeys.find(key => 
-      key.endsWith('_URL') && 
+      key.endsWith('_REST_API_URL') && 
       process.env[key] && 
-      typeof process.env[key] === 'string' &&
-      (process.env[key].includes('upstash.io') || process.env[key].includes('vercel-storage.com'))
+      typeof process.env[key] === 'string'
     );
     
-    // Если нашли ссылку, автоматически вычисляем имя ключа для пароля
     if (foundUrlKey) {
       kvUrl = process.env[foundUrlKey];
-      const possibleTokenKey1 = foundUrlKey.replace('_URL', '_TOKEN');
-      const possibleTokenKey2 = foundUrlKey.replace('REST_API_URL', 'REST_API_TOKEN');
-      kvToken = process.env[possibleTokenKey1] || process.env[possibleTokenKey2];
+      const tokenKey = foundUrlKey.replace('_URL', '_TOKEN');
+      kvToken = process.env[tokenKey] || process.env.KV_REST_API_TOKEN;
     }
   }
 
+  // Функция для безопасной отправки команд в базу данных
   async function executeRedisCommand(commandArray) {
     if (!kvUrl || !kvToken) return null;
     try {
@@ -46,6 +46,7 @@ export default async function handler(request, response) {
     }
   }
 
+  // 1. ЗАПИСЬ ТАПОВ В БАЗУ ДАННЫХ
   if (request.method === 'POST') {
     let mode = request.body?.mode;
     if (!mode && typeof request.body === 'string') {
@@ -60,16 +61,25 @@ export default async function handler(request, response) {
         dbSuccess = true;
       }
     }
-    return response.status(200).json({ success: true, mode, dbSuccess });
+    // Возвращаем статус успеха
+    return response.status(200).json({ 
+      success: true, 
+      mode: mode, 
+      dbSuccess: dbSuccess,
+      dbConnected: !!(kvUrl && kvToken)
+    });
   }
 
+  // 2. ЧТЕНИЕ СТАТУСА ПРИ ОТКРЫТИИ ВИЗИТКИ
   if (request.method === 'GET') {
-    // 1. Проверяем ручной перехват в базе
     let override = null;
+    
+    // Сначала проверяем базу данных (ручной перехват)
     if (kvUrl && kvToken) {
       override = await executeRedisCommand(["GET", "elena_override_mode"]);
     }
 
+    // Если есть ручной перехват, отдаем его немедленно
     if (override === 'day' || override === 'night') {
       return response.status(200).json({ 
         mode: override, 
@@ -78,7 +88,7 @@ export default async function handler(request, response) {
       });
     }
 
-    // 2. Если перехвата нет, смотрим на часы (Ереван)
+    // Если перехвата нет, смотрим на часы (Строго Ереванское время)
     const now = new Date();
     const options = { timeZone: 'Asia/Yerevan', hour: 'numeric', weekday: 'short', hour12: false };
     const formatter = new Intl.DateTimeFormat('en-US', options);
@@ -94,23 +104,30 @@ export default async function handler(request, response) {
     let mode = 'night';
     let source = 'time';
 
-    // В субботу и воскресенье всегда личная
+    // Выходные: всегда личная визитка
     if (weekday === 'Sat' || weekday === 'Sun') {
       mode = 'night';
       source = 'weekend';
     } 
-    // В будни с 9 до 18 рабочая
+    // Будни с 9:00 до 18:00: рабочая визитка
     else if (hour >= 9 && hour < 18) {
       mode = 'day';
       source = 'time';
     }
+    // Будни после 18:00: личная визитка
+    else {
+      mode = 'night';
+      source = 'time';
+    }
 
+    // Возвращаем результат
     return response.status(200).json({ 
-      mode, 
-      source, 
+      mode: mode, 
+      source: source, 
       dbConnected: !!(kvUrl && kvToken) 
     });
   }
 
+  // Защита от неверных запросов
   return response.status(405).json({ error: 'Method not allowed' });
 }
